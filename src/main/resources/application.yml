@@ -1,3 +1,22 @@
+spring.mvc:
+  pathmatch:
+    matching-strategy: ant_path_matcher
+springdoc:
+  version: '@project.version@'
+  api-docs:
+    path: /api-docs
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  swagger-ui:
+    operations-sorter: alpha
+    tags-sorter: alpha
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+    display-query-params-without-oauth2: true
+    doc-expansion: none
+  paths-to-match:
+    - /api/**
+
 spring.jpa:
     database: mysql
     hibernate:
@@ -12,7 +31,7 @@ spring.datasource:
     hikari.maximum-pool-size: 4
     url: jdbc:mysql://localhost:3306/sns_contents?rewriteBatchedStatements=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
     username: root
-    password: root
+    password: mysql123
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 jwt:
