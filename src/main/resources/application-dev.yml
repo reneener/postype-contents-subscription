@@ -1,4 +1,8 @@
-spring.jpa:
+spring:
+  profiles:
+    default: dev
+---
+spring:jpa:
     database: mysql
     hibernate:
       dialect: org.hibernate.dialect.MySQL8Dialect
@@ -7,6 +11,9 @@ spring.jpa:
         hibernate:
           format_sql: true
     show-sql: true
+spring:config:
+    activate:
+      on-profile: dev
 
 spring.datasource:
     hikari.maximum-pool-size: 4
