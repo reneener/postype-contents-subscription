@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TimeLinePostsUseCase {
 	final private PostService postService;
-	final private MemberService memberService;
 	final private TimeLineService timeLineService;
 
 	public PageCursor<Post> executeTimeLine(MemberDto member, CursorRequest request){//push

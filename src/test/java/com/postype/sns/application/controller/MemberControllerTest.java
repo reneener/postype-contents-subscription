@@ -1,5 +1,6 @@
 package com.postype.sns.application.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -21,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -127,10 +129,9 @@ public class MemberControllerTest {
 	@WithMockUser
 	@DisplayName("알람 리스트 가져오기 성공 테스트")
 	public void getAlarmSuccessTest() throws Exception {
-		Long id = 1L;
-		Pageable pageable = mock(Pageable.class);
 
-		when(memberService.getAlarmList(id, pageable)).thenReturn(Page.empty());
+		when(memberService.getAlarmList(any(), any())).thenReturn(Page.empty());
+
 		mockMvc.perform(get("/api/v1/members/alarm")
 			.contentType(MediaType.APPLICATION_JSON))
 			.andDo(print())

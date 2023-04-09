@@ -9,4 +9,5 @@ public class OrderFixture {
 		Order order = Order.of(member, post);
 		return order;
 	}
+
 }

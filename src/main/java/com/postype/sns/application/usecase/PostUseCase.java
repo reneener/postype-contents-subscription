@@ -16,9 +16,7 @@ public class PostUseCase {
 
 	private final PostService postService;
 	private final FollowService followService;
-	private final MemberService memberService;
 	private final TimeLineService timeLineService;
-
 
 	//TODO :: 트랜잭션 걸지 않을 거임 팔로워 많을 경우 과부하
 	public Long execute(String title, String body, MemberDto memberDto, int price){

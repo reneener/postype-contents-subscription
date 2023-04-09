@@ -66,13 +66,12 @@ public class Post {
 		post.setPrice(new Point(price));
 		return post;
 	}
-
 	public static Post of(PostDto dto){
 		Post post = new Post();
 		post.setId(dto.getId());
 		post.setTitle(dto.getTitle());
 		post.setBody(dto.getBody());
-		post.setMember(Member.toDto(dto.getMember()));
+		post.setMember(Member.fromDto(dto.getMember()));
 		post.setPrice(new Point(dto.getPrice()));
 		post.setRegisteredAt(dto.getRegisteredAt());
 		post.setUpdatedAt(dto.getUpdatedAt());

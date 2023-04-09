@@ -1,5 +1,6 @@
 package com.postype.sns.application.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -8,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.postype.sns.application.contoller.dto.request.PostCreateRequest;
 import com.postype.sns.application.contoller.dto.MemberDto;
+import com.postype.sns.application.usecase.OrderUseCase;
 import com.postype.sns.domain.member.model.Member;
 import com.postype.sns.domain.order.model.Order;
 import com.postype.sns.application.contoller.dto.OrderDto;
@@ -15,6 +17,7 @@ import com.postype.sns.domain.order.service.OrderService;
 import com.postype.sns.domain.post.model.Post;
 import com.postype.sns.application.contoller.dto.PostDto;
 import com.postype.sns.fixture.MemberFixture;
+import com.postype.sns.fixture.OrderFixture;
 import com.postype.sns.fixture.PostFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,25 +42,23 @@ public class OrderControllerTest {
 	private ObjectMapper objectMapper;
 
 	@MockBean
-	private OrderService orderService;
+	private OrderUseCase orderUseCase;
 
 	@Test
 	@DisplayName("주문 성공 테스트")
 	@WithMockUser
-	@Transactional
 	void orderCreateSuccess() throws Exception {
 		Member member = MemberFixture.get("member", "password", 1L);
-		Post post = PostFixture.get(member.getMemberId(), 1L, 1L);
+		Post post = PostFixture.get("memberId", 1L, 1L);
 
-		when(orderService.create(MemberDto.fromEntity(member), PostDto.fromPost(post)))
-			.thenReturn(OrderDto.fromEntity(Order.of(member, post)));
+		when(orderUseCase.create(any(), any()))
+			.thenReturn(OrderDto.fromEntity(OrderFixture.get(member, post)));
 
-		mockMvc.perform(post("/api/v1/order/1")
+		mockMvc.perform(post("/api/v1/orders/1")
 			.contentType(MediaType.APPLICATION_JSON)
 		).andDo(print())
 			.andExpect(status().isOk());
 	}
-
 	@Test
 	@WithAnonymousUser //인증 되지 않은 유저
 	@DisplayName("주문 요청시 로그인을 하지 않은 경우 실패 테스트")

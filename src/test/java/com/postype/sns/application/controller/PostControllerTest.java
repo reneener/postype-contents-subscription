@@ -14,14 +14,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.postype.sns.application.contoller.dto.MemberDto;
 import com.postype.sns.application.contoller.dto.request.PostCommentRequest;
 import com.postype.sns.application.contoller.dto.request.PostCreateRequest;
 import com.postype.sns.application.contoller.dto.request.PostModifyRequest;
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.exception.ApplicationException;
+import com.postype.sns.application.usecase.PostUseCase;
+import com.postype.sns.domain.member.model.Member;
 import com.postype.sns.domain.member.model.util.CursorRequest;
 import com.postype.sns.application.contoller.dto.PostDto;
+import com.postype.sns.domain.member.service.FollowService;
 import com.postype.sns.domain.post.service.PostService;
+import com.postype.sns.fixture.MemberFixture;
 import com.postype.sns.fixture.PostFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,17 +54,25 @@ public class PostControllerTest {
 	@MockBean
 	private PostService postService;
 
+	@MockBean
+	private PostUseCase postUseCase;
+
 	@Test
 	@WithMockUser //인증 된 유저
 	@DisplayName("포스트 작성 성공 테스트")
 	void postCreateSuccess() throws java.lang.Exception {
-
 		String title = "title";
 		String body = "body";
+		String memberId = "memberId";
+		int price = 1000;
+		Member writer = MemberFixture.get(memberId, "password", 1L);
+
+		when(postUseCase.execute(title, body, MemberDto.fromEntity(writer), price))
+			.thenReturn(PostFixture.get(memberId, 1L, 1L).getId());
 
 		mockMvc.perform(post("/api/v1/posts")
 					.contentType(MediaType.APPLICATION_JSON)
-					.content(objectMapper.writeValueAsBytes(new PostCreateRequest(title, body, 0)))
+					.content(objectMapper.writeValueAsBytes(new PostCreateRequest(title, body, price)))
 			).andDo(print())
 			.andExpect(status().isOk());
 	}

@@ -18,8 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class OrderUseCase {
-
-	private final MemberService memberService;
 	private final PostService postService;
 	private final OrderService orderService;
 

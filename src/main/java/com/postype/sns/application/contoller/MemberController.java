@@ -46,7 +46,7 @@ public class MemberController {
 	}
 	@GetMapping("/alarm")
 	public Response<Page<AlarmResponse>> getAlarm(@AuthenticationPrincipal MemberDto memberDto, Pageable pageable){
-		return Response.success(memberService.getAlarmList(memberDto.getId(), pageable).map(
+		return Response.success(memberService.getAlarmList(memberDto, pageable).map(
 			AlarmResponse::fromDto));
 	}
 	@GetMapping("/alarm/subscribe")

@@ -14,14 +14,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LikeRepository extends JpaRepository<Like, Long> {
-
-	Optional<Like> findByMemberAndPost(Member member, Post post);
-
-	//@Query(nativeQuery = true, value="SELECT COUNT(*) from likes as l where l.post_id = :postId ")
-	//Integer countByPostLike(@Param("postId") Long postId);
-
+	Optional<Like> findAllByMemberAndPost(Member member, Post post);
 	long countByPost(Post post);
-
 	@Transactional
 	@Modifying
 	@Query(nativeQuery = true, value = "UPDATE likes entity SET deleted_at = NOW() WHERE entity.post_id = :post")

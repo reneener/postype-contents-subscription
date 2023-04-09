@@ -49,11 +49,10 @@ public class PostService{
 	private final CommentRepository commentRepository;
 	private final AlarmProducer alarmProducer;
 
-
 	@Transactional
 	public Long create(String title, String body, MemberDto memberDto, int price){
 		//user find
-		Member writer = Member.toDto(memberDto);
+		Member writer = Member.fromDto(memberDto);
 		//post save
 		Long savedPostId = postRepository.save(Post.of(title, body, writer, price)).getId();
 		//Member following writer
@@ -75,12 +74,12 @@ public class PostService{
 	@Transactional
 	public PostDto modify(String title, String body, MemberDto memberDto, Long postId){
 		//user find
-		Member foundedMember = Member.toDto(memberDto);
+		Member foundedMember = Member.fromDto(memberDto);
 		//post exist
 		Post post = getPostOrException(postId);
 
 		//post permission
-		if(post.getMember() != foundedMember){
+		if(post.getMember().getId() != foundedMember.getId()){
 			throw new ApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", foundedMember.getMemberId(), postId));
 		}
 
@@ -91,18 +90,19 @@ public class PostService{
 	@Transactional
 	public void delete(MemberDto memberDto, Long postId){
 		//user find
-		Member foundedMember = Member.toDto(memberDto);
+		Member foundedMember = Member.fromDto(memberDto);
 		Post post = getPostOrException(postId);
 
-		if(post.getMember() != foundedMember){
-			throw new ApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", foundedMember.getMemberId(), postId));
+		if(post.getMember().getId() != foundedMember.getId()){
+			throw new ApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission to delete post %s", foundedMember.getMemberId(), postId));
 		}
+
 		likeRepository.deleteAllByPost(post);
 		commentRepository.deleteAllByPost(post);
 		postRepository.delete(post);
 	}
 
-	public Page<PostDto> getList (Pageable pageable){
+	public Page<PostDto> getList(Pageable pageable){
 		return postRepository.findAll(pageable).map(PostDto::fromPost);
 	}
 
@@ -139,10 +139,9 @@ public class PostService{
 	@Transactional
 	public void like(Long postId, MemberDto memberDto){
 		Post post = getPostOrException(postId);
-		Member member = Member.toDto(memberDto);
+		Member member = Member.fromDto(memberDto);
 
-		//check like
-		likeRepository.findByMemberAndPost(member, post).ifPresent(it -> {
+		likeRepository.findAllByMemberAndPost(member, post).ifPresent(it -> {
 			throw new ApplicationException(ErrorCode.ALREADY_LIKE,
 				String.format("memberName %s already like post %d", member.getMemberId(), postId));
 		});
@@ -164,7 +163,7 @@ public class PostService{
 	}
 
 	public Page<PostDto> getLikeByMember(MemberDto memberDto, Pageable pageable) {
-		Member member = Member.toDto(memberDto);
+		Member member = Member.fromDto(memberDto);
 
 		List<Like> likedList = likeRepository.findAllByMember(member);
 		List<Post> postList = likedList.stream().map(Like::getPost).toList();
@@ -174,16 +173,15 @@ public class PostService{
 
 	@Transactional
 	public void comment(Long postId, MemberDto memberDto, String comment){
-		Member member = Member.toDto(memberDto);
+		Member member = Member.fromDto(memberDto);
 		Post post = getPostOrException(postId);
 
-		//comment save
-		Comment cmt = commentRepository.save(Comment.of(member, post, comment));
+		Long cmtId = commentRepository.save(Comment.of(member, post, comment)).getId();
 
 		alarmProducer.send(new AlarmEvent(post.getMember().getId(), //알람을 받는 포스트 작성자에게 알람 전송
 			AlarmType.NEW_COMMENT_ON_POST,
 			new AlarmArgs(member.getId(), //알람을 발생시킨 코멘트를 작성한 사람의 아이디
-				"Comment", cmt.getId())//알람이 발생한 코멘트의 아이디
+				"Comment", cmtId)//알람이 발생한 코멘트의 아이디
 			)
 		);
 
@@ -197,9 +195,4 @@ public class PostService{
 		return postRepository.findById(postId).orElseThrow(() ->
 			new ApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not founded", postId)));
 	}
-	private Member getMemberOrException(String memberId){
-		return memberRepository.findByMemberId(memberId).orElseThrow(() ->
-			new ApplicationException(ErrorCode.MEMBER_NOT_FOUND, String.format("%s not founded", memberId)));
-	}
-
 }

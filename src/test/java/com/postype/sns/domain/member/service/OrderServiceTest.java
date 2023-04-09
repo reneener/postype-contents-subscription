@@ -45,23 +45,22 @@ public class OrderServiceTest {
 	void orderSuccess(){
 		String memberId = "test05";
 		String password = "test";
-		Member memberFixture = MemberFixture.get(memberId, password, 1L);
-		Post postFixture = PostFixture.get(memberId, 2L, 1L);
+		Member member = MemberFixture.get(memberId, password, 1L);
+		Post post = PostFixture.get(memberId, 2L, 1L);
+		Order order = Order.of(member, post);
 
-		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(mock(Member.class)));
-		when(postRepository.findById(2L)).thenReturn(Optional.of(mock(Post.class)));
-		when(orderRepository.save(any())).thenReturn(mock(Order.class));
+		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
+		when(postRepository.findById(2L)).thenReturn(Optional.of(post));
+		when(orderRepository.save(any())).thenReturn(order);
 
-		Assertions.assertDoesNotThrow(() -> orderService.create(MemberDto.fromEntity(memberFixture), PostDto.fromPost(postFixture)));
+		Assertions.assertDoesNotThrow(() -> orderService.create(MemberDto.fromEntity(member), PostDto.fromPost(post)));
 	}
-/*
-	*/
-
 	@Test
 	@DisplayName("주문 등록 시 이미 구입한 포스트일 경우 실패 테스트")
 	void orderCreateFailCausedByDuplicatedOrder(){
 		String memberId = "test05";
 		String password = "test";
+
 		Member memberFixture = MemberFixture.get(memberId, password, 1L);
 		Post postFixture = PostFixture.get(memberId, 2L, 1L);
 		Order orderFixture = OrderFixture.get(memberFixture, postFixture);
@@ -75,7 +74,4 @@ public class OrderServiceTest {
 			() -> orderService.create(MemberDto.fromEntity(memberFixture), PostDto.fromPost(postFixture)));
 		Assertions.assertEquals(ErrorCode.ALREADY_ORDER, e.getErrorCode());
 	}
-
-
-
 }

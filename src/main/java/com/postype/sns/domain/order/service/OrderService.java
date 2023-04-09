@@ -22,12 +22,14 @@ public class OrderService {
 
 	private final OrderRepository orderRepository;
 
+
 	public OrderDto create(MemberDto memberDto, PostDto post){
 		orderRepository.findAllByMemberIdAndPostId(memberDto.getId(), post.getId()).ifPresent(it -> {
 			throw new ApplicationException(ErrorCode.ALREADY_ORDER,
 				String.format("%s already ordered this post", memberDto.getMemberId()));
 		});
-		Member member = Member.toDto(memberDto);
+		Member member = Member.fromDto(memberDto);
+
 		Order order = orderRepository.save(Order.of(member, Post.of(post)));
 
 		return OrderDto.fromEntity(order);

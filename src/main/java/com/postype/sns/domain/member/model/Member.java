@@ -70,7 +70,7 @@ public class Member {
 		member.setEmail(email);
 		return member;
 	}
-	public static Member toDto(MemberDto dto){
+	public static Member fromDto(MemberDto dto){
 		Member member = new Member();
 		member.setId(dto.getId());
 		member.setMemberId(dto.getMemberId());

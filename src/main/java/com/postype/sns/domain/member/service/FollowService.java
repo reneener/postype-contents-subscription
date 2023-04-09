@@ -4,7 +4,6 @@ import com.postype.sns.application.exception.ApplicationException;
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.contoller.dto.FollowDto;
 import com.postype.sns.application.contoller.dto.MemberDto;
-import com.postype.sns.domain.member.model.Alarm;
 import com.postype.sns.domain.member.model.AlarmArgs;
 import com.postype.sns.domain.member.model.AlarmEvent;
 import com.postype.sns.domain.member.model.AlarmType;
@@ -29,14 +28,13 @@ public class FollowService {
 
 	private final FollowRepository followRepository;
 	private final MemberRepository memberRepository;
-	private final AlarmRepository alarmRepository;
 	private final AlarmProducer alarmProducer;
 
 	@Transactional
 	public FollowDto create(MemberDto fromMemberDto, MemberDto toMemberDto) {
 
-		Member toMember = Member.toDto(toMemberDto);
-		Member fromMember = Member.toDto(fromMemberDto);
+		Member toMember = Member.fromDto(toMemberDto);
+		Member fromMember = Member.fromDto(fromMemberDto);
 
 		if(fromMember.getId() == toMember.getId())
 			throw new ApplicationException(ErrorCode.MEMBER_IS_SAME);

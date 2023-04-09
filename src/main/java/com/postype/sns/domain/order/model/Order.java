@@ -53,13 +53,8 @@ public class Order {
 		this.member = member;
 		member.getOrders().add(this);
 	}
-
 	@PrePersist
 	void orderAt() {
 		this.registerAt = Timestamp.from(Instant.now());
 	}
-
-
-
-
 }

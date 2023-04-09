@@ -64,8 +64,8 @@ public class MemberService {
 		return token;
 	}
 
-	public Page<AlarmDto> getAlarmList(Long memberId, Pageable pageable){
-		return alarmRepository.findAllByMemberId(memberId, pageable).map(AlarmDto::fromEntity);
+	public Page<AlarmDto> getAlarmList(MemberDto memberDto, Pageable pageable){
+		return alarmRepository.findAllByMemberId(memberDto.getId(), pageable).map(AlarmDto::fromEntity);
 	}
 	private Member getMemberOrException(String memberId){
 		return memberRepository.findByMemberId(memberId).orElseThrow(() ->

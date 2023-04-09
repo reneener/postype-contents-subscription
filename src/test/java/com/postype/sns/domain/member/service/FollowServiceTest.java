@@ -1,5 +1,6 @@
 package com.postype.sns.domain.member.service;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,30 +40,13 @@ public class FollowServiceTest {
 
 		Member toMember = MemberFixture.get(toMemberId, "000", 1L);
 		Member fromMember = MemberFixture.get(fromMemberId, "000", 2L);
+		Follow follow = Follow.of(fromMember, toMember);
 
 		when(memberRepository.findByMemberId(fromMemberId)).thenReturn(Optional.of(fromMember));
 		when(memberRepository.findByMemberId(toMemberId)).thenReturn(Optional.of(toMember));
-		when(followrepository.save(Follow.of(fromMember, toMember))).thenReturn(mock(Follow.class));
+		when(followrepository.save(any())).thenReturn(follow);
 
-		Assertions.assertDoesNotThrow(() -> followService.create(fromMember.getId(), toMember.getMemberId()));
-	}
-
-	@Test
-	@WithMockUser
-	@DisplayName("팔로우 할 멤버가 존재하지 않는 경우 실패 테스트")
-	void createFollowFailCausedByNotfoundedMember(){
-		String toMemberId = "toMember";
-		String fromMemberId = "fromMember";
-
-		Member toMember = MemberFixture.get(toMemberId, "000", 1L);
-		Member fromMember = MemberFixture.get(fromMemberId, "000", 2L);
-
-		when(memberRepository.findByMemberId(fromMemberId)).thenReturn(Optional.of(fromMember));
-		when(memberRepository.findByMemberId(toMemberId)).thenReturn(Optional.empty());
-
-		ApplicationException e = Assertions.assertThrows(
-			ApplicationException.class, () -> followService.create(toMember.getId(), fromMember.getMemberId()));
-		Assertions.assertEquals(ErrorCode.MEMBER_NOT_FOUND, e.getErrorCode());
+		Assertions.assertDoesNotThrow(() -> followService.create(MemberDto.fromEntity(fromMember), MemberDto.fromEntity(toMember)));
 	}
 
 	@Test
@@ -72,14 +56,14 @@ public class FollowServiceTest {
 		String toMemberId = "toMember";
 		String fromMemberId = "toMember";
 
-		Member toMember = MemberFixture.get(toMemberId, "000", 1L);
-		Member fromMember = MemberFixture.get(fromMemberId, "000", 1L);
+		Member toMember = MemberFixture.get(toMemberId, "password", 1L);
+		Member fromMember = MemberFixture.get(fromMemberId, "password", 1L);
 
 		when(memberRepository.findByMemberId(fromMemberId)).thenReturn(Optional.of(fromMember));
 		when(memberRepository.findByMemberId(toMemberId)).thenReturn(Optional.of(toMember));
 
 		ApplicationException e = Assertions.assertThrows(
-			ApplicationException.class, () -> followService.create(toMember.getId(), fromMember.getMemberId()));
+			ApplicationException.class, () -> followService.create(MemberDto.fromEntity(toMember), MemberDto.fromEntity(fromMember)));
 		Assertions.assertEquals(ErrorCode.MEMBER_IS_SAME, e.getErrorCode());
 	}
 
