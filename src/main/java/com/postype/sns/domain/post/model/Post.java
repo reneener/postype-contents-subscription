@@ -1,6 +1,7 @@
 package com.postype.sns.domain.post.model;
 
 import com.postype.sns.application.contoller.dto.PostDto;
+import com.postype.sns.domain.BaseDateEntity;
 import com.postype.sns.domain.member.model.Member;
 import com.postype.sns.domain.order.model.Point;
 import java.sql.Timestamp;
@@ -29,7 +30,7 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE post SET deleted_at = NOW() where id = ?")
 @Where(clause = "deleted_at is NULL")
-public class Post {
+public class Post extends BaseDateEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -41,22 +42,6 @@ public class Post {
 	private Member member;
 	@Column(name="price")
 	private Point price;
-	@Column(name = "register_at")
-	private Timestamp registeredAt;
-	@Column(name = "updated_at")
-	private Timestamp updatedAt;
-	@Column(name = "deleted_at")
-	private Timestamp deletedAt;
-
-	@PrePersist
-	void registeredAt() {
-		this.registeredAt = Timestamp.from(Instant.now());
-	}
-
-	@PreUpdate
-	void updatedAt() {
-		this.updatedAt = Timestamp.from(Instant.now());
-	}
 
 	public static Post of(String title, String body, Member member, int price){
 		Post post = new Post();
@@ -73,9 +58,6 @@ public class Post {
 		post.setBody(dto.getBody());
 		post.setMember(Member.fromDto(dto.getMember()));
 		post.setPrice(new Point(dto.getPrice()));
-		post.setRegisteredAt(dto.getRegisteredAt());
-		post.setUpdatedAt(dto.getUpdatedAt());
-		post.setDeletedAt(dto.getDeletedAt());
 		return post;
 	}
 

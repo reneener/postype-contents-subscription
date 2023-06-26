@@ -1,5 +1,6 @@
 package com.postype.sns.domain.member.model;
 
+import com.postype.sns.domain.BaseDateEntity;
 import com.vladmihalcea.hibernate.type.json.JsonType;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -36,7 +37,7 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE alarm SET deleted_at = NOW() where id = ?")
 @Where(clause = "deleted_at is NULL")
-public class Alarm {
+public class Alarm extends BaseDateEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -49,22 +50,6 @@ public class Alarm {
 	@Type(type = "json")
 	@Column(columnDefinition = "json")
 	private AlarmArgs alarmArgs;
-	@Column(name = "register_at")
-	private Timestamp registeredAt;
-	@Column(name = "updated_at")
-	private Timestamp updatedAt;
-	@Column(name = "deleted_at")
-	private Timestamp deletedAt;
-
-	@PrePersist
-	void registeredAt() {
-		this.registeredAt = Timestamp.from(Instant.now());
-	}
-
-	@PreUpdate
-	void updatedAt() {
-		this.updatedAt = Timestamp.from(Instant.now());
-	}
 
 	public static Alarm of(Member member, AlarmType type, AlarmArgs args){
 		Alarm alarm = new Alarm();

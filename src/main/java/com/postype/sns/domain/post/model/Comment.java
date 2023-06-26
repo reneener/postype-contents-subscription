@@ -1,5 +1,6 @@
 package com.postype.sns.domain.post.model;
 
+import com.postype.sns.domain.BaseDateEntity;
 import com.postype.sns.domain.member.model.Member;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -30,7 +31,7 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE comment SET deleted_at = NOW() where id = ?")
 @Where(clause = "deleted_at is NULL")
-public class Comment {
+public class Comment extends BaseDateEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -42,23 +43,6 @@ public class Comment {
 	private Post post;
 	@Column(name = "comment")
 	private String comment;
-	@Column(name = "register_at")
-	private Timestamp registeredAt;
-	@Column(name = "updated_at")
-	private Timestamp updatedAt;
-	@Column(name = "deleted_at")
-	private Timestamp deletedAt;
-
-	@PrePersist
-	void registeredAt() {
-		this.registeredAt = Timestamp.from(Instant.now());
-	}
-
-	@PreUpdate
-	void updatedAt() {
-		this.updatedAt = Timestamp.from(Instant.now());
-	}
-
 	public static Comment of(Member member, Post post, String comment){
 		Comment commentEntity = new Comment();
 		commentEntity.setMember(member);

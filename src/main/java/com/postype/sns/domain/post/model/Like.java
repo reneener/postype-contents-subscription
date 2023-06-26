@@ -1,5 +1,6 @@
 package com.postype.sns.domain.post.model;
 
+import com.postype.sns.domain.BaseDateEntity;
 import com.postype.sns.domain.member.model.Member;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -27,7 +28,7 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE likes SET deleted_at = NOW() where id = ?")
 @Where(clause = "deleted_at is NULL")
-public class Like {
+public class Like extends BaseDateEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -37,22 +38,6 @@ public class Like {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name= "post_id")
 	private Post post;
-	@Column(name = "register_at")
-	private Timestamp registeredAt;
-	@Column(name = "updated_at")
-	private Timestamp updatedAt;
-	@Column(name = "deleted_at")
-	private Timestamp deletedAt;
-
-	@PrePersist
-	void registeredAt() {
-		this.registeredAt = Timestamp.from(Instant.now());
-	}
-
-	@PreUpdate
-	void updatedAt() {
-		this.updatedAt = Timestamp.from(Instant.now());
-	}
 
 	public static Like of(Member member, Post post){
 		Like like = new Like();
