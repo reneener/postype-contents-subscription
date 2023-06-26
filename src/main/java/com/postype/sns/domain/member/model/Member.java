@@ -1,6 +1,7 @@
 package com.postype.sns.domain.member.model;
 
 import com.postype.sns.application.contoller.dto.MemberDto;
+import com.postype.sns.domain.BaseDateEntity;
 import com.postype.sns.domain.order.model.Order;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -30,7 +31,7 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE member SET deleted_at = NOW() where id = ?")
 @Where(clause = "deleted_at is NULL")
-public class Member {
+public class Member extends BaseDateEntity {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -45,22 +46,6 @@ public class Member {
 	private MemberRole role = MemberRole.USER;
 	@OneToMany(mappedBy = "member")
 	private List<Order> orders = new ArrayList<Order>();
-	@Column(name = "register_at")
-	private Timestamp registeredAt;
-	@Column(name = "updated_at")
-	private Timestamp updatedAt;
-	@Column(name = "deleted_at")
-	private Timestamp deletedAt;
-
-	@PrePersist
-	void registeredAt() {
-		this.registeredAt = Timestamp.from(Instant.now());
-	}
-
-	@PreUpdate
-	void updatedAt() {
-		this.updatedAt = Timestamp.from(Instant.now());
-	}
 	//새 멤버 엔티티를 만들어 주는 메소드
 	public static Member of(String memberId, String password, String memberName, String email){
 		Member member = new Member();

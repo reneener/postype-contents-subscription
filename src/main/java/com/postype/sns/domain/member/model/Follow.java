@@ -1,6 +1,7 @@
 package com.postype.sns.domain.member.model;
 
 import com.postype.sns.application.contoller.dto.MemberDto;
+import com.postype.sns.domain.BaseDateEntity;
 import java.sql.Timestamp;
 import java.time.Instant;
 import javax.persistence.Column;
@@ -30,7 +31,7 @@ import org.hibernate.annotations.Where;
 @SQLDelete(sql = "UPDATE follow SET deleted_at = NOW() where id = ?")
 @Where(clause = "deleted_at is NULL")
 //TODO :: table에 인덱스 추가
-public class Follow {
+public class Follow extends BaseDateEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -40,20 +41,7 @@ public class Follow {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name= "to_member_id")
 	private Member toMember;
-	@Column(name = "register_at")
-	private Timestamp registeredAt;
-	@Column(name = "updated_at")
-	private Timestamp updatedAt;
-	@Column(name = "deleted_at")
-	private Timestamp deletedAt;
-	@PrePersist
-	void registeredAt() {
-		this.registeredAt = Timestamp.from(Instant.now());
-	}
-	@PreUpdate
-	void updatedAt() {
-		this.updatedAt = Timestamp.from(Instant.now());
-	}
+
 	public static Follow of(Member fromMember, Member toMember){
 		Follow follow = new Follow();
 		follow.setFromMember(fromMember);
