@@ -16,7 +16,9 @@ public enum ErrorCode {
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server error"),
 	DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Error occurs in database"),
 	ALREADY_LIKE(HttpStatus.CONFLICT, "Member already liked post"),
-	ALREADY_ORDER(HttpStatus.CONFLICT, "Post already ordered by member");
+	ALREADY_ORDER(HttpStatus.CONFLICT, "Post already ordered by member"),
+	ALARM_CONNECT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Connecting alarm occurs error")
+
 	;
 
 	private final HttpStatus status;

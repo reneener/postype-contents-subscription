@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.exception.ApplicationException;
-import com.postype.sns.domain.member.model.entity.Member;
+import com.postype.sns.domain.member.model.Member;
 import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.fixture.MemberFixture;
 import java.util.Optional;

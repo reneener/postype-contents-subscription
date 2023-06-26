@@ -1,6 +1,6 @@
 package com.postype.sns.application.contoller.dto.response;
 
-import com.postype.sns.domain.post.model.PostDto;
+import com.postype.sns.application.contoller.dto.PostDto;
 import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

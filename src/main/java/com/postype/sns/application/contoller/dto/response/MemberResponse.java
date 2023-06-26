@@ -1,6 +1,6 @@
 package com.postype.sns.application.contoller.dto.response;
 
-import com.postype.sns.domain.member.model.MemberDto;
+import com.postype.sns.application.contoller.dto.MemberDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -1,14 +1,11 @@
 package com.postype.sns.domain.order.model;
 
-import com.postype.sns.domain.member.model.MemberDto;
-import com.postype.sns.domain.member.model.entity.Member;
+import com.postype.sns.domain.member.model.Member;
 import com.postype.sns.domain.post.model.Post;
 import java.sql.Timestamp;
 import java.time.Instant;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -16,16 +13,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "orders")
@@ -60,13 +53,8 @@ public class Order {
 		this.member = member;
 		member.getOrders().add(this);
 	}
-
 	@PrePersist
 	void orderAt() {
 		this.registerAt = Timestamp.from(Instant.now());
 	}
-
-
-
-
 }

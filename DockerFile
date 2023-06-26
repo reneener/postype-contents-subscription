@@ -1,0 +1,7 @@
+
+FROM openjdk:8-jdk
+
+COPY ./postype-content-subscription /postype-content-subscription
+WORKDIR /postype-content-subscription
+
+CMD ["./gradlew", "bootRun"]

@@ -1,19 +1,18 @@
 package com.postype.sns.domain.post.model;
 
-import com.postype.sns.domain.member.model.MemberDto;
-import com.postype.sns.domain.member.model.entity.Member;
-import com.postype.sns.domain.order.model.Order;
+import com.postype.sns.application.contoller.dto.PostDto;
+import com.postype.sns.domain.member.model.Member;
 import com.postype.sns.domain.order.model.Point;
 import java.sql.Timestamp;
 import java.time.Instant;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -37,7 +36,7 @@ public class Post {
 	private String title;
 	@Column(columnDefinition = "TEXT")
 	private String body;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name= "member_id")
 	private Member member;
 	@Column(name="price")
@@ -67,14 +66,13 @@ public class Post {
 		post.setPrice(new Point(price));
 		return post;
 	}
-
 	public static Post of(PostDto dto){
 		Post post = new Post();
 		post.setId(dto.getId());
 		post.setTitle(dto.getTitle());
 		post.setBody(dto.getBody());
-		post.setMember(Member.of(dto.getMember()));
-		post.setPrice(dto.getPrice());
+		post.setMember(Member.fromDto(dto.getMember()));
+		post.setPrice(new Point(dto.getPrice()));
 		post.setRegisteredAt(dto.getRegisteredAt());
 		post.setUpdatedAt(dto.getUpdatedAt());
 		post.setDeletedAt(dto.getDeletedAt());

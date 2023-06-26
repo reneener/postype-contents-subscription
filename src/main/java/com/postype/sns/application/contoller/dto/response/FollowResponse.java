@@ -1,6 +1,6 @@
 package com.postype.sns.application.contoller.dto.response;
 
-import com.postype.sns.domain.member.model.FollowDto;
+import com.postype.sns.application.contoller.dto.FollowDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

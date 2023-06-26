@@ -1,6 +1,6 @@
 package com.postype.sns.fixture;
 
-import com.postype.sns.domain.member.model.entity.Member;
+import com.postype.sns.domain.member.model.Member;
 import com.postype.sns.domain.member.model.MemberRole;
 import java.sql.Timestamp;
 import java.time.Instant;
