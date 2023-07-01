@@ -1,4 +1,4 @@
-package com.postype.sns.application.contoller.dto.response;
+package com.postype.sns.application.controller.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

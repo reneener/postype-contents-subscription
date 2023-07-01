@@ -2,14 +2,13 @@ package com.postype.sns.domain.member.service;
 
 import com.postype.sns.application.exception.ApplicationException;
 import com.postype.sns.application.exception.ErrorCode;
-import com.postype.sns.application.contoller.dto.FollowDto;
-import com.postype.sns.application.contoller.dto.MemberDto;
+import com.postype.sns.application.controller.dto.FollowDto;
+import com.postype.sns.application.controller.dto.MemberDto;
 import com.postype.sns.domain.member.model.AlarmArgs;
 import com.postype.sns.domain.member.model.AlarmEvent;
 import com.postype.sns.domain.member.model.AlarmType;
 import com.postype.sns.domain.member.model.Follow;
 import com.postype.sns.domain.member.model.Member;
-import com.postype.sns.domain.member.repository.AlarmRepository;
 import com.postype.sns.domain.member.repository.FollowRepository;
 import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.producer.AlarmProducer;

@@ -1,6 +1,6 @@
 package com.postype.sns.configuration.filter;
 
-import com.postype.sns.application.contoller.dto.MemberDto;
+import com.postype.sns.application.controller.dto.MemberDto;
 import com.postype.sns.domain.member.service.MemberService;
 import com.postype.sns.utill.JwtTokenUtils;
 import java.io.IOException;

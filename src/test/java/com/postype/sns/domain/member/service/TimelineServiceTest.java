@@ -4,7 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.postype.sns.application.contoller.dto.MemberDto;
+import com.postype.sns.application.controller.dto.MemberDto;
 import com.postype.sns.application.usecase.TimeLinePostsUseCase;
 import com.postype.sns.domain.member.model.Member;
 import com.postype.sns.domain.member.model.util.CursorRequest;
@@ -14,7 +14,6 @@ import com.postype.sns.domain.post.model.TimeLine;
 import com.postype.sns.domain.post.repository.PostRepository;
 import com.postype.sns.domain.post.repository.TimeLineRepository;
 import com.postype.sns.fixture.MemberFixture;
-import com.postype.sns.fixture.PostFixture;
 import com.postype.sns.fixture.TimeLineFixture;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Pageable;
 
 @SpringBootTest
 public class TimelineServiceTest {

@@ -1,6 +1,6 @@
 package com.postype.sns.application.exception;
 
-import com.postype.sns.application.contoller.dto.response.Response;
+import com.postype.sns.application.controller.dto.response.Response;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

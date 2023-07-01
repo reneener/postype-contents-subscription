@@ -1,12 +1,13 @@
-package com.postype.sns.application.contoller.dto.request;
+package com.postype.sns.application.controller.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostModifyRequest {
+public class PostCreateRequest {
 	private String title;
 	private String body;
 	private int price;

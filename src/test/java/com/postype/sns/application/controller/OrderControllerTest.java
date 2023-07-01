@@ -7,15 +7,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.postype.sns.application.contoller.dto.request.PostCreateRequest;
-import com.postype.sns.application.contoller.dto.MemberDto;
+import com.postype.sns.application.controller.dto.request.PostCreateRequest;
 import com.postype.sns.application.usecase.OrderUseCase;
 import com.postype.sns.domain.member.model.Member;
-import com.postype.sns.domain.order.model.Order;
-import com.postype.sns.application.contoller.dto.OrderDto;
-import com.postype.sns.domain.order.service.OrderService;
+import com.postype.sns.application.controller.dto.OrderDto;
 import com.postype.sns.domain.post.model.Post;
-import com.postype.sns.application.contoller.dto.PostDto;
 import com.postype.sns.fixture.MemberFixture;
 import com.postype.sns.fixture.OrderFixture;
 import com.postype.sns.fixture.PostFixture;
@@ -29,7 +25,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @AutoConfigureMockMvc

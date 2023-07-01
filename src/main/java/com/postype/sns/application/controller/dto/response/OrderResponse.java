@@ -1,7 +1,7 @@
-package com.postype.sns.application.contoller.dto.response;
+package com.postype.sns.application.controller.dto.response;
 
 
-import com.postype.sns.application.contoller.dto.OrderDto;
+import com.postype.sns.application.controller.dto.OrderDto;
 import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
