@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @RequestMapping("/api/v1/members")
@@ -34,7 +35,7 @@ public class MemberController {
 
 	@Operation(summary = "회원가입", description = "memberId, memberName, password, email로 신규 가입을 진행합니다")
 	@PostMapping("/register")
-	public Response<MemberRegisterResponse> register(@RequestBody @ApiParam(value = "회원가입 요청", required = true) MemberRegisterRequest request){
+	public Response<MemberRegisterResponse> register(@RequestBody MemberRegisterRequest request){
 		return Response.success(
 			MemberRegisterResponse.fromMemberDto(memberService.register(request.getMemberId(), request.getPassword(), request.getMemberName(), request.getEmail())));
 	}
@@ -46,12 +47,12 @@ public class MemberController {
 	}
 	//TODO :: Alarm API description 추가
 	@GetMapping("/alarm")
-	public Response<Page<AlarmResponse>> getAlarm(@AuthenticationPrincipal MemberDto memberDto, Pageable pageable){
+	public Response<Page<AlarmResponse>> getAlarm(@ApiIgnore @AuthenticationPrincipal MemberDto memberDto, Pageable pageable){
 		return Response.success(memberService.getAlarmList(memberDto, pageable).map(
 			AlarmResponse::fromDto));
 	}
 	@GetMapping("/alarm/subscribe")
-	public SseEmitter subscribe(@AuthenticationPrincipal MemberDto memberDto){
+	public SseEmitter subscribe(@ApiIgnore @AuthenticationPrincipal MemberDto memberDto){
 		return alarmService.connectAlarm(memberDto.getId());
 	}
 

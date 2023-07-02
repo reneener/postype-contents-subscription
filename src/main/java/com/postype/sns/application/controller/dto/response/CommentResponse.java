@@ -14,7 +14,6 @@ public class CommentResponse {
 	private String comment;
 	private Timestamp registeredAt;
 	private Timestamp updatedAt;
-	private Timestamp deletedAt;
 
 	public static CommentResponse fromDto(CommentDto comment){
 		return new CommentResponse(
@@ -23,8 +22,7 @@ public class CommentResponse {
 			comment.getId(),
 			comment.getComment(),
 			comment.getRegisteredAt(),
-			comment.getUpdatedAt(),
-			comment.getDeletedAt()
+			comment.getUpdatedAt()
 		);
 	}
 }

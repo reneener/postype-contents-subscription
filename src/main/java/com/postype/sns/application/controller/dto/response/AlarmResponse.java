@@ -14,19 +14,13 @@ public class AlarmResponse {
 	private AlarmType alarmType;
 	private AlarmArgs alarmArgs;
 	private String message;
-	private Timestamp registerAt;
-	private Timestamp updatedAt;
-	private Timestamp deletedAt;
 
 	public static AlarmResponse fromDto(AlarmDto alarm){
 		return new AlarmResponse(
 			alarm.getId(),
 			alarm.getAlarmType(),
 			alarm.getAlarmArgs(),
-			alarm.getAlarmType().getMessage(),
-			alarm.getRegisterAt(),
-			alarm.getUpdatedAt(),
-			alarm.getDeletedAt()
+			alarm.getAlarmType().getMessage()
 		);
 	}
 }

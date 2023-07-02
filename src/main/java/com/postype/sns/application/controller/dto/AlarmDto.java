@@ -13,18 +13,12 @@ public class AlarmDto {
 	private Long id;
 	private AlarmType alarmType;
 	private AlarmArgs alarmArgs;
-	private Timestamp registerAt;
-	private Timestamp updatedAt;
-	private Timestamp deletedAt;
 
 	public static AlarmDto fromEntity(Alarm alarm){
 		return new AlarmDto(
 			alarm.getId(),
 			alarm.getAlarmType(),
-			alarm.getAlarmArgs(),
-			alarm.getRegisteredAt(),
-			alarm.getUpdatedAt(),
-			alarm.getDeletedAt()
+			alarm.getAlarmArgs()
 		);
 	}
 }

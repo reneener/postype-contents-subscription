@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @RequestMapping("/api/v1/posts")
@@ -38,7 +39,7 @@ public class PostController {
 	private final PostUseCase createPostUseCase;
 	@Operation(summary = "포스트 발행", description = "로그인한 멤버가 title, body, price를 작성하여 포스트를 발행합니다.")
 	@PostMapping
-	public Response<Void> create(@RequestBody PostCreateRequest request, @AuthenticationPrincipal MemberDto memberDto){
+	public Response<Void> create(@RequestBody PostCreateRequest request, @ApiIgnore @AuthenticationPrincipal MemberDto memberDto){
 		createPostUseCase.execute(request.getTitle(), request.getBody(), memberDto, request.getPrice());
 		return Response.success();
 	}
@@ -52,7 +53,7 @@ public class PostController {
 
 	@Operation(summary = "포스트 삭제", description = "로그인한 멤버가 postId에 해당하는 포스트를 삭제합니다")
 	@DeleteMapping("/{postId}")
-	public Response<Void> delete(@PathVariable Long postId, @AuthenticationPrincipal MemberDto memberDto){
+	public Response<Void> delete(@PathVariable Long postId, @ApiIgnore @AuthenticationPrincipal MemberDto memberDto){
 		postService.delete(memberDto, postId);
 		return Response.success();
 	}
@@ -65,19 +66,19 @@ public class PostController {
 
 	@Operation(summary = "작성한 포스트 목록 가져오기", description = "로그인한 멤버가 발행한 최신 포스트 목록을 가져옵니다")
 	@GetMapping("/my") //TODO :: 오프셋 기반 timestamp 내림차순으로 정렬
-	public Response<Page<PostResponse>> getMyPostList(Pageable pageable, @AuthenticationPrincipal MemberDto memberDto){
+	public Response<Page<PostResponse>> getMyPostList(Pageable pageable, @ApiIgnore @AuthenticationPrincipal MemberDto memberDto){
 		return Response.success(postService.getMyPostList(memberDto, pageable).map(PostResponse::fromPostDto));
 	}
 
 	@Operation(summary = "타임라인 가져오기", description = "로그인한 멤버의 타임라인 목록을 가져옵니다")
 	@GetMapping("/member/timeline")
-	public Response<PageCursor<Post>> getTimeLine(@AuthenticationPrincipal MemberDto memberDto, CursorRequest request){
+	public Response<PageCursor<Post>> getTimeLine(@ApiIgnore @AuthenticationPrincipal MemberDto memberDto, CursorRequest request){
 		return Response.success(timeLinePostsUseCase.executeTimeLine(memberDto, request));
 	}
 
 	@Operation(summary = "좋아요 표시", description = "로그인한 멤버가 postId에 해당하는 포스트에 좋아요 표시를 합니다")
 	@PostMapping("{postId}/likes")
-	public Response<Void> like(@PathVariable Long postId, @AuthenticationPrincipal MemberDto memberDto){
+	public Response<Void> like(@PathVariable Long postId, @ApiIgnore @AuthenticationPrincipal MemberDto memberDto){
 		postService.like(postId, memberDto);
 		return Response.success();
 	}
@@ -89,13 +90,13 @@ public class PostController {
 
 	@Operation(summary = "좋아요 한 포스트 목록 가져오기", description = "로그인한 멤버가 좋아요 표시 한 포스트 목록을 가져옵니다")
 	@GetMapping("/likes")
-	public Response<Page<PostResponse>> getMyLikePosts(@AuthenticationPrincipal MemberDto memberDto, Pageable pageable){
+	public Response<Page<PostResponse>> getMyLikePosts(@ApiIgnore @AuthenticationPrincipal MemberDto memberDto, Pageable pageable){
 		return Response.success(postService.getLikeByMember(memberDto, pageable).map(PostResponse::fromPostDto));
 	}
 
 	@Operation(summary = "코멘트 등록하기", description = "로그인한 멤버가 해당 postId에 코멘트를 등록합니다")
 	@PostMapping("{postId}/comments")
-	public Response<Void> comment(@PathVariable Long postId, @RequestBody PostCommentRequest request, @AuthenticationPrincipal MemberDto memberDto){
+	public Response<Void> comment(@PathVariable Long postId, @RequestBody PostCommentRequest request, @ApiIgnore @AuthenticationPrincipal MemberDto memberDto){
 		postService.comment(postId, memberDto, request.getComment());
 		return Response.success();
 	}

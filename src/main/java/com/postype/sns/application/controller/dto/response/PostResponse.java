@@ -15,7 +15,6 @@ public class PostResponse {
 	private MemberResponse member;
 	private Timestamp registeredAt;
 	private Timestamp updatedAt;
-	private Timestamp deletedAt;
 
 	public static PostResponse fromPostDto(PostDto post){
 		return new PostResponse(
@@ -24,8 +23,7 @@ public class PostResponse {
 			post.getBody(),
 			MemberResponse.fromMemberDto(post.getMember()),
 			post.getRegisteredAt(),
-			post.getUpdatedAt(),
-			post.getDeletedAt()
+			post.getUpdatedAt()
 		);
 	}
 }

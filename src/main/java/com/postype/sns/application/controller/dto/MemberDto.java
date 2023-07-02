@@ -2,11 +2,14 @@ package com.postype.sns.application.controller.dto;
 
 import com.postype.sns.domain.member.model.Member;
 import com.postype.sns.domain.member.model.MemberRole;
+import io.swagger.annotations.ApiModelProperty;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +23,7 @@ public class MemberDto implements UserDetails {
 	private String memberName;
 	private String email;
 	private MemberRole role;
-	private Timestamp registeredAt;
+	private Timestamp registerAt;
 	private Timestamp updatedAt;
 	private Timestamp deletedAt;
 
@@ -37,17 +40,14 @@ public class MemberDto implements UserDetails {
 			member.getDeletedAt()
 		);
 	}
-
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return List.of(new SimpleGrantedAuthority(this.getRole().toString()));
 	}
-
 	@Override
 	public String getUsername() {
 		return this.getMemberId();
 	}
-
 	@Override
 	public boolean isAccountNonExpired() {
 		return this.deletedAt == null;

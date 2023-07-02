@@ -10,13 +10,11 @@ import lombok.Getter;
 public class MemberRegisterResponse {
 	private Long id;
 	private String memberId;
-	private MemberRole role;
 
 	public static MemberRegisterResponse fromMemberDto(MemberDto member){
 		return new MemberRegisterResponse(
 			member.getId(),
-			member.getMemberId(),
-			member.getRole()
+			member.getMemberId()
 		);
 	}
 }
