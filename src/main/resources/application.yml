@@ -20,7 +20,7 @@ spring.mvc:
   pathmatch:
     matching-strategy: ant_path_matcher
 springdoc:
-  version: '@project.version@'
+
   api-docs:
     path: /api-docs
   default-consumes-media-type: application/json

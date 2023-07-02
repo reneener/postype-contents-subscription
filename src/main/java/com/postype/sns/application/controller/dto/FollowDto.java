@@ -1,5 +1,6 @@
-package com.postype.sns.application.contoller.dto;
+package com.postype.sns.application.controller.dto;
 
+import com.postype.sns.domain.BaseDateEntity;
 import com.postype.sns.domain.member.model.Follow;
 import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
@@ -7,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class FollowDto {
+public class FollowDto{
 	private Long id;
 	private Long fromMemberId;
 	private Long toMemberId;

@@ -14,17 +14,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.postype.sns.application.contoller.dto.MemberDto;
-import com.postype.sns.application.contoller.dto.request.PostCommentRequest;
-import com.postype.sns.application.contoller.dto.request.PostCreateRequest;
-import com.postype.sns.application.contoller.dto.request.PostModifyRequest;
+import com.postype.sns.application.controller.dto.MemberDto;
+import com.postype.sns.application.controller.dto.request.PostCommentRequest;
+import com.postype.sns.application.controller.dto.request.PostCreateRequest;
+import com.postype.sns.application.controller.dto.request.PostModifyRequest;
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.exception.ApplicationException;
 import com.postype.sns.application.usecase.PostUseCase;
 import com.postype.sns.domain.member.model.Member;
 import com.postype.sns.domain.member.model.util.CursorRequest;
-import com.postype.sns.application.contoller.dto.PostDto;
-import com.postype.sns.domain.member.service.FollowService;
+import com.postype.sns.application.controller.dto.PostDto;
 import com.postype.sns.domain.post.service.PostService;
 import com.postype.sns.fixture.MemberFixture;
 import com.postype.sns.fixture.PostFixture;

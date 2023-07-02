@@ -1,28 +1,31 @@
-package com.postype.sns.application.contoller.dto.response;
+package com.postype.sns.application.controller.dto;
 
-import com.postype.sns.application.contoller.dto.PostDto;
+import com.postype.sns.domain.post.model.Post;
 import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class PostResponse {
+public class PostDto {
 
 	private Long id;
 	private String title;
 	private String body;
-	private MemberResponse member;
+	private MemberDto member;
+	private int price;
 	private Timestamp registeredAt;
 	private Timestamp updatedAt;
 	private Timestamp deletedAt;
 
-	public static PostResponse fromPostDto(PostDto post){
-		return new PostResponse(
+
+	public static PostDto fromPost(Post post){
+		return new PostDto(
 			post.getId(),
 			post.getTitle(),
 			post.getBody(),
-			MemberResponse.fromMemberDto(post.getMember()),
+			MemberDto.fromEntity(post.getMember()),
+			post.getPrice().getValue(),
 			post.getRegisteredAt(),
 			post.getUpdatedAt(),
 			post.getDeletedAt()

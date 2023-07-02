@@ -9,11 +9,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.postype.sns.application.contoller.dto.request.MemberLoginRequest;
-import com.postype.sns.application.contoller.dto.request.MemberRegisterRequest;
+import com.postype.sns.application.controller.dto.request.MemberLoginRequest;
+import com.postype.sns.application.controller.dto.request.MemberRegisterRequest;
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.exception.ApplicationException;
-import com.postype.sns.application.contoller.dto.MemberDto;
+import com.postype.sns.application.controller.dto.MemberDto;
 import com.postype.sns.domain.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,8 +22,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;

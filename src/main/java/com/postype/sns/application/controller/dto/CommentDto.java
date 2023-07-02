@@ -1,6 +1,5 @@
-package com.postype.sns.application.contoller.dto.response;
+package com.postype.sns.application.controller.dto;
 
-import com.postype.sns.application.contoller.dto.CommentDto;
 import com.postype.sns.domain.post.model.Comment;
 import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
@@ -8,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class CommentResponse {
+public class CommentDto {
 	private Long id;
 	private String memberId;
 	private Long postId;
@@ -17,11 +16,11 @@ public class CommentResponse {
 	private Timestamp updatedAt;
 	private Timestamp deletedAt;
 
-	public static CommentResponse fromDto(CommentDto comment){
-		return new CommentResponse(
+	public static CommentDto fromEntity(Comment comment){
+		return new CommentDto(
 			comment.getId(),
-			comment.getMemberId(),
-			comment.getId(),
+			comment.getMember().getMemberId(),
+			comment.getPost().getId(),
 			comment.getComment(),
 			comment.getRegisteredAt(),
 			comment.getUpdatedAt(),

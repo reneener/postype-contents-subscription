@@ -1,9 +1,9 @@
 package com.postype.sns.domain.member.service;
 
-import com.postype.sns.application.contoller.dto.AlarmDto;
+import com.postype.sns.application.controller.dto.AlarmDto;
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.exception.ApplicationException;
-import com.postype.sns.application.contoller.dto.MemberDto;
+import com.postype.sns.application.controller.dto.MemberDto;
 import com.postype.sns.domain.member.model.Member;
 import com.postype.sns.domain.member.repository.AlarmRepository;
 import com.postype.sns.domain.member.repository.MemberRepository;

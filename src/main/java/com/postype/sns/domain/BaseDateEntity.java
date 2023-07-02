@@ -22,3 +22,4 @@ public class BaseDateEntity {
 	@Column(name = "deleted_at", updatable = false)
 	private Timestamp deletedAt;
 }
+

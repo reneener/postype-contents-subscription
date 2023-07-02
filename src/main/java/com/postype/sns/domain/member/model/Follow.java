@@ -1,10 +1,6 @@
 package com.postype.sns.domain.member.model;
 
-import com.postype.sns.application.contoller.dto.MemberDto;
 import com.postype.sns.domain.BaseDateEntity;
-import java.sql.Timestamp;
-import java.time.Instant;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -12,8 +8,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

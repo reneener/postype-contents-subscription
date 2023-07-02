@@ -1,20 +1,14 @@
 package com.postype.sns.domain.post.service;
 
-import static java.util.stream.Collectors.toList;
-
-import com.postype.sns.application.contoller.dto.AlarmDto;
-import com.postype.sns.application.contoller.dto.CommentDto;
-import com.postype.sns.application.contoller.dto.MemberDto;
+import com.postype.sns.application.controller.dto.CommentDto;
+import com.postype.sns.application.controller.dto.MemberDto;
 import com.postype.sns.application.exception.ErrorCode;
 import com.postype.sns.application.exception.ApplicationException;
-import com.postype.sns.domain.member.model.Alarm;
 import com.postype.sns.domain.member.model.AlarmArgs;
 import com.postype.sns.domain.member.model.AlarmEvent;
 import com.postype.sns.domain.member.model.AlarmType;
 import com.postype.sns.domain.member.model.Follow;
-import com.postype.sns.domain.member.repository.AlarmRepository;
 import com.postype.sns.domain.member.repository.FollowRepository;
-import com.postype.sns.domain.member.service.AlarmService;
 import com.postype.sns.domain.post.model.Comment;
 import com.postype.sns.domain.post.model.Like;
 import com.postype.sns.domain.post.repository.CommentRepository;
@@ -24,12 +18,10 @@ import com.postype.sns.domain.member.model.util.CursorRequest;
 import com.postype.sns.domain.member.model.util.PageCursor;
 import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.domain.post.model.Post;
-import com.postype.sns.application.contoller.dto.PostDto;
+import com.postype.sns.application.controller.dto.PostDto;
 import com.postype.sns.domain.post.repository.PostRepository;
 import com.postype.sns.producer.AlarmProducer;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
