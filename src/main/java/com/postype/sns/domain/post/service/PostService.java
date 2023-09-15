@@ -22,6 +22,7 @@ import com.postype.sns.application.controller.dto.PostDto;
 import com.postype.sns.domain.post.repository.PostRepository;
 import com.postype.sns.producer.AlarmProducer;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,6 @@ import org.springframework.stereotype.Service;
 public class PostService{
 
 	private final PostRepository postRepository;
-	private final MemberRepository memberRepository;
 	private final FollowRepository followRepository;
 	private final LikeRepository likeRepository;
 	private final CommentRepository commentRepository;
@@ -49,7 +49,7 @@ public class PostService{
 		Long savedPostId = postRepository.save(Post.of(title, body, writer, price)).getId();
 		//Member following writer
 		List<Member> followingList = followRepository.findAllByToMemberId(writer.getId()).stream().map(
-			Follow::getFromMember).toList();
+			Follow::getFromMember).collect(Collectors.toList());
 
 		for(int i=0; i< followingList.size(); i++) {
 			Member followingMember = followingList.get(i);
@@ -122,9 +122,9 @@ public class PostService{
 
 	private List<Post> findAllByMemberId(List<Long> memberIds, CursorRequest request){
 		if(request.hasKey())
-			return postRepository.findAllByLessThanIdAndInMemberIdsAndOrderByIdDesc(request.key(), memberIds,
-				request.size());
-		return postRepository.findAllByINMemberIdsAndOrderByIdDesc(memberIds, request.size());
+			return postRepository.findAllByLessThanIdAndInMemberIdsAndOrderByIdDesc(request.getKey(), memberIds,
+				request.getSize());
+		return postRepository.findAllByINMemberIdsAndOrderByIdDesc(memberIds, request.getSize());
 
 	}
 
@@ -158,9 +158,9 @@ public class PostService{
 		Member member = Member.fromDto(memberDto);
 
 		List<Like> likedList = likeRepository.findAllByMember(member);
-		List<Post> postList = likedList.stream().map(Like::getPost).toList();
+		List<Post> postList = likedList.stream().map(Like::getPost).collect(Collectors.toList());
 
-		return postRepository.findAllByMember(postList.stream().map(Post::getId).toList(), pageable).map(PostDto::fromPost);
+		return postRepository.findAllByMember(postList.stream().map(Post::getId).collect(Collectors.toList()), pageable).map(PostDto::fromPost);
 	}
 
 	@Transactional

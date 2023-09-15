@@ -6,6 +6,8 @@ import com.postype.sns.domain.member.service.FollowService;
 import com.postype.sns.domain.post.service.PostService;
 import com.postype.sns.domain.post.service.TimeLineService;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +26,7 @@ public class PostUseCase {
 			.getFollowers(memberDto)
 			.stream()
 			.map(FollowDto::getFromMemberId)
-			.toList();
+			.collect(Collectors.toList());
 		timeLineService.deliveryToTimeLine(postId, followedMemberIds);
 		return postId;
 	}

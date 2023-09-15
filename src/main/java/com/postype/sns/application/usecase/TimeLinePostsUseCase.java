@@ -8,6 +8,8 @@ import com.postype.sns.domain.post.model.TimeLine;
 import com.postype.sns.domain.post.service.PostService;
 import com.postype.sns.domain.post.service.TimeLineService;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +21,9 @@ public class TimeLinePostsUseCase {
 
 	public PageCursor<Post> executeTimeLine(MemberDto member, CursorRequest request){//push
 		PageCursor<TimeLine> pagedTimeLines = timeLineService.getTimeLine(member.getId(), request);
-		List<Long> postIds = pagedTimeLines.contents().stream().map(TimeLine::getPostId).toList();
+		List<Long> postIds = pagedTimeLines.getContents().stream().map(TimeLine::getPostId).collect(Collectors.toList());
 		List<Post> posts = postService.getPostsByIds(postIds);
-		return new PageCursor(pagedTimeLines.nextCursorRequest(), posts);
+		return new PageCursor(pagedTimeLines.getNextCursorRequest(), posts);
 	}
 
 }
