@@ -1,7 +1,7 @@
 package com.postype.sns.domain.post.repository;
 
-import com.postype.sns.domain.post.model.Comment;
-import com.postype.sns.domain.post.model.Post;
+import com.postype.sns.domain.post.domain.Comment;
+import com.postype.sns.domain.post.domain.Post;
 import javax.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

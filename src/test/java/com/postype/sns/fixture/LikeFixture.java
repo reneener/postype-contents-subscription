@@ -1,8 +1,8 @@
 package com.postype.sns.fixture;
 
-import com.postype.sns.domain.post.model.Like;
-import com.postype.sns.domain.member.model.Member;
-import com.postype.sns.domain.post.model.Post;
+import com.postype.sns.domain.post.domain.Like;
+import com.postype.sns.domain.member.domain.Member;
+import com.postype.sns.domain.post.domain.Post;
 import java.sql.Timestamp;
 import java.time.Instant;
 

@@ -1,8 +1,8 @@
 package com.postype.sns.domain.post.repository;
 
-import com.postype.sns.domain.post.model.Like;
-import com.postype.sns.domain.member.model.Member;
-import com.postype.sns.domain.post.model.Post;
+import com.postype.sns.domain.post.domain.Like;
+import com.postype.sns.domain.member.domain.Member;
+import com.postype.sns.domain.post.domain.Post;
 import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;

@@ -1,8 +1,8 @@
 package com.postype.sns.domain.post.repository;
 
-import com.postype.sns.domain.post.model.TimeLine;
+import com.postype.sns.domain.post.domain.TimeLine;
 import java.util.List;
-import org.springframework.data.domain.Page;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

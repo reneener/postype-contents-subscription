@@ -1,8 +1,8 @@
 package com.postype.sns.fixture;
 
-import com.postype.sns.domain.member.model.Member;
-import com.postype.sns.domain.order.model.Point;
-import com.postype.sns.domain.post.model.Post;
+import com.postype.sns.domain.member.domain.Member;
+import com.postype.sns.domain.order.domain.Point;
+import com.postype.sns.domain.post.domain.Post;
 
 public class PostFixture {
 	public static Post get(String memberId, Long postId, Long id){

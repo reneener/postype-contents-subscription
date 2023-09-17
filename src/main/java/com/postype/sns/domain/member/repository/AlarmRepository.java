@@ -1,7 +1,6 @@
 package com.postype.sns.domain.member.repository;
 
-import com.postype.sns.domain.member.model.Alarm;
-import com.postype.sns.domain.member.model.Member;
+import com.postype.sns.domain.member.domain.Alarm;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

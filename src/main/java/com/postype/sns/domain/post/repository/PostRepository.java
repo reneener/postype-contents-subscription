@@ -1,8 +1,8 @@
 package com.postype.sns.domain.post.repository;
 
-import com.postype.sns.domain.post.model.Post;
+import com.postype.sns.domain.post.domain.Post;
 import java.util.List;
-import java.util.stream.DoubleStream;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

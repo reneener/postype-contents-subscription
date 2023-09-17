@@ -1,6 +1,6 @@
 package com.postype.sns.domain.member.repository;
 
-import com.postype.sns.domain.member.model.Follow;
+import com.postype.sns.domain.member.domain.Follow;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

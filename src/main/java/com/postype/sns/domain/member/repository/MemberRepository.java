@@ -1,6 +1,6 @@
 package com.postype.sns.domain.member.repository;
 
-import com.postype.sns.domain.member.model.Member;
+import com.postype.sns.domain.member.domain.Member;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

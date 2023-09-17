@@ -1,8 +1,8 @@
 package com.postype.sns.fixture;
 
-import com.postype.sns.domain.member.model.Member;
-import com.postype.sns.domain.order.model.Order;
-import com.postype.sns.domain.post.model.Post;
+import com.postype.sns.domain.member.domain.Member;
+import com.postype.sns.domain.order.domain.Order;
+import com.postype.sns.domain.post.domain.Post;
 
 public class OrderFixture {
 	public static Order get(Member member, Post post) {
