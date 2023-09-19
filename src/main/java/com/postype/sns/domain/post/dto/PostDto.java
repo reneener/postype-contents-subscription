@@ -3,6 +3,8 @@ package com.postype.sns.domain.post.dto;
 import com.postype.sns.domain.member.dto.MemberDto;
 import com.postype.sns.domain.post.domain.Post;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,9 +17,9 @@ public class PostDto {
 	private String body;
 	private MemberDto member;
 	private int price;
-	private Timestamp registeredAt;
-	private Timestamp updatedAt;
-	private Timestamp deletedAt;
+	private LocalDateTime registeredAt;
+	private LocalDateTime updatedAt;
+	private LocalDateTime deletedAt;
 
 
 	public static PostDto fromPost(Post post){

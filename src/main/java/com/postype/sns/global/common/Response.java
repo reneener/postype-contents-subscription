@@ -3,11 +3,15 @@ package com.postype.sns.global.common;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor
 @Getter
 public class Response<T> {
 	private String resultCode;
 	private T result;
+
+	public Response(String resultCode, T result){
+		this.resultCode = resultCode;
+		this.result = result;
+	}
 
 	public static <T> Response<T> error(String errorCode){
 		return new Response<>(errorCode, null);

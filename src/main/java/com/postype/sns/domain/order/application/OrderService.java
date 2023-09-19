@@ -14,15 +14,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class OrderService {
 
 	private final OrderRepository orderRepository;
 
-
+	@Transactional
 	public OrderDto create(MemberDto memberDto, PostDto post){
 		orderRepository.findAllByMemberIdAndPostId(memberDto.getId(), post.getId()).ifPresent(it -> {
 			throw new ApplicationException(ErrorCode.ALREADY_ORDER,
@@ -30,7 +32,7 @@ public class OrderService {
 		});
 		Member member = Member.fromDto(memberDto);
 
-		Order order = orderRepository.save(Order.of(member, Post.of(post)));
+		Order order = orderRepository.save(Order.of(member, Post.fromDto(post)));
 
 		return OrderDto.fromEntity(order);
 	}

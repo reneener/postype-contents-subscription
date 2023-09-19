@@ -1,7 +1,10 @@
 package com.postype.sns.domain.post.application;
 
+import com.postype.sns.domain.order.domain.Point;
 import com.postype.sns.domain.post.dto.CommentDto;
 import com.postype.sns.domain.member.dto.MemberDto;
+import com.postype.sns.domain.post.dto.request.PostCreateRequest;
+import com.postype.sns.domain.post.dto.request.PostModifyRequest;
 import com.postype.sns.global.common.ErrorCode;
 import com.postype.sns.global.exception.ApplicationException;
 import com.postype.sns.domain.member.domain.AlarmArgs;
@@ -22,16 +25,18 @@ import com.postype.sns.domain.post.repository.PostRepository;
 import com.postype.sns.global.utill.AlarmProducer;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class PostService{
 
 	private final PostRepository postRepository;
@@ -41,51 +46,53 @@ public class PostService{
 	private final AlarmProducer alarmProducer;
 
 	@Transactional
-	public Long create(String title, String body, MemberDto memberDto, int price){
-		//user find
+	public Long create(PostCreateRequest request, MemberDto memberDto){
 		Member writer = Member.fromDto(memberDto);
-		//post save
-		Long savedPostId = postRepository.save(Post.of(title, body, writer, price)).getId();
-		//Member following writer
-		List<Member> followingList = followRepository.findAllByToMemberId(writer.getId()).stream().map(
-			Follow::getFromMember).collect(Collectors.toList());
 
-		for(int i=0; i< followingList.size(); i++) {
-			Member followingMember = followingList.get(i);
+		Post newPost = Post.builder()
+				.title(request.getTitle())
+				.body(request.getBody())
+				.member(writer)
+				.price(new Point(request.getPrice()))
+				.build();
+
+		Long savedPostId = postRepository.save(newPost).getId();
+
+		List<Member> followingList = followRepository.findAllByToMemberId(writer.getId()).stream()
+				.map(Follow::getFromMember)
+				.collect(Collectors.toList());
+
+		followingList.forEach(followingMember -> {
 			alarmProducer.send(new AlarmEvent(followingMember.getId(), //알람을 받는 작성자를 팔로우 하고 있는 사람들
-				AlarmType.NEW_POST_ON_SUBSCRIBER,
-				new AlarmArgs(writer.getId(), //알람을 발생시킨 포스트의 작성자
-					"Post", savedPostId)//알람을 발생시킨 포스트의 아이디
-				)
-			);
-		}
+							AlarmType.NEW_POST_ON_SUBSCRIBER,
+							new AlarmArgs(writer.getId(),"Post", savedPostId))
+						);
+			});
+
 		return savedPostId;
 	}
 
 	@Transactional
-	public PostDto modify(String title, String body, MemberDto memberDto, Long postId){
-		//user find
+	public PostDto modify(Long postId, PostModifyRequest request, MemberDto memberDto){
 		Member foundedMember = Member.fromDto(memberDto);
-		//post exist
 		Post post = getPostOrException(postId);
 
-		//post permission
 		if(post.getMember().getId() != foundedMember.getId()){
 			throw new ApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", foundedMember.getMemberId(), postId));
 		}
 
-		post.setTitle(title);
-		post.setBody(body);
+		post.modify(request.getTitle(), request.getBody());
+
 		return PostDto.fromPost(postRepository.saveAndFlush(post));
 	}
 	@Transactional
 	public void delete(MemberDto memberDto, Long postId){
-		//user find
 		Member foundedMember = Member.fromDto(memberDto);
 		Post post = getPostOrException(postId);
 
 		if(post.getMember().getId() != foundedMember.getId()){
-			throw new ApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission to delete post %s", foundedMember.getMemberId(), postId));
+			throw new ApplicationException(ErrorCode.INVALID_PERMISSION,
+					String.format("%s has no permission to delete post %s", foundedMember.getMemberId(), postId));
 		}
 
 		likeRepository.deleteAllByPost(post);
@@ -97,17 +104,19 @@ public class PostService{
 		return postRepository.findAll(pageable).map(PostDto::fromPost);
 	}
 
-	//내가 쓴 글 읽기
 	public Page<PostDto> getMyPostList (MemberDto memberDto, Pageable pageable){
-		return postRepository.findAllByMemberId(memberDto.getId(), pageable).map(PostDto::fromPost);
+		return postRepository.findAllByMemberId(memberDto.getId(), pageable)
+				.map(PostDto::fromPost);
 	}
 
 	public List<Post> getPostsByIds(List<Long> ids){
 		return postRepository.findAllByInId(ids);
 	}
+
 	public PostDto getPost(Long id) {
-		return postRepository.findById(id).map(PostDto::fromPost).orElseThrow(() ->
-		new ApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not founded", id)));
+		return postRepository.findById(id)
+				.map(PostDto::fromPost).orElseThrow(() ->
+						new ApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not founded", id)));
 	}
 
 	public PageCursor<Post> getTimeLinePosts(List<Long> memberIds, CursorRequest request){
@@ -137,8 +146,7 @@ public class PostService{
 				String.format("memberName %s already like post %d", member.getMemberId(), postId));
 		});
 
-		//like save
-		likeRepository.save(Like.of(member, post));
+		likeRepository.save(new Like(member, post));
 
 		alarmProducer.send(new AlarmEvent(post.getMember().getId(), //알람을 받는 포스트 작성자에게 알람 전송
 				AlarmType.NEW_LIKE_ON_POST,
@@ -157,17 +165,27 @@ public class PostService{
 		Member member = Member.fromDto(memberDto);
 
 		List<Like> likedList = likeRepository.findAllByMember(member);
-		List<Post> postList = likedList.stream().map(Like::getPost).collect(Collectors.toList());
+		List<Post> postList = likedList.stream()
+				.map(Like::getPost)
+				.collect(Collectors.toList());
 
-		return postRepository.findAllByMember(postList.stream().map(Post::getId).collect(Collectors.toList()), pageable).map(PostDto::fromPost);
+		return postRepository.findAllByMember(postList.stream()
+				.map(Post::getId)
+				.collect(Collectors.toList()), pageable)
+				.map(PostDto::fromPost);
 	}
 
 	@Transactional
 	public void comment(Long postId, MemberDto memberDto, String comment){
 		Member member = Member.fromDto(memberDto);
 		Post post = getPostOrException(postId);
+		Comment newComment = Comment.builder()
+				.member(member)
+				.post(post)
+				.comment(comment)
+				.build();
 
-		Long cmtId = commentRepository.save(Comment.of(member, post, comment)).getId();
+		Long cmtId = commentRepository.save(newComment).getId();
 
 		alarmProducer.send(new AlarmEvent(post.getMember().getId(), //알람을 받는 포스트 작성자에게 알람 전송
 			AlarmType.NEW_COMMENT_ON_POST,
@@ -180,8 +198,10 @@ public class PostService{
 
 	public Page<CommentDto> getComment(Long postId, Pageable pageable){
 		Post post = getPostOrException(postId);
-		return commentRepository.findAllByPost(post, pageable).map(CommentDto::fromEntity);
+		return commentRepository.findAllByPost(post, pageable)
+				.map(CommentDto::fromEntity);
 	}
+
 	private Post getPostOrException(Long postId){
 		return postRepository.findById(postId).orElseThrow(() ->
 			new ApplicationException(ErrorCode.POST_NOT_FOUND, String.format("%s not founded", postId)));

@@ -41,7 +41,10 @@ public class FollowServiceTest {
 
 		Member toMember = MemberFixture.get(toMemberId, "000", 1L);
 		Member fromMember = MemberFixture.get(fromMemberId, "000", 2L);
-		Follow follow = Follow.of(fromMember, toMember);
+		Follow follow = Follow.builder()
+				.fromMember(fromMember)
+				.toMember(toMember)
+				.build();
 
 		when(memberRepository.findByMemberId(fromMemberId)).thenReturn(Optional.of(fromMember));
 		when(memberRepository.findByMemberId(toMemberId)).thenReturn(Optional.of(toMember));

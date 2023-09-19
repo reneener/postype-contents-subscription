@@ -13,7 +13,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class EmitterRepository {
 
 	private Map<String, SseEmitter> emitterMap = new HashMap<>();
-	//요청 브라우저 정보 저장
 	public SseEmitter save(Long memberId, SseEmitter sseEmitter){
 		final String key = getKey(memberId);
 		emitterMap.put(key, sseEmitter);

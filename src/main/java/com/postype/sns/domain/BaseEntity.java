@@ -1,6 +1,7 @@
 package com.postype.sns.domain;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
@@ -15,11 +16,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class BaseEntity {
 	@CreatedDate
 	@Column(name = "register_at", updatable = false)
-	private Timestamp registeredAt;
+	private LocalDateTime registeredAt;
+
 	@LastModifiedDate
 	@Column(name = "updated_at", updatable = true)
-	private Timestamp updatedAt;
-	@Column(name = "deleted_at", updatable = false)
-	private Timestamp deletedAt;
+	private LocalDateTime updatedAt;
 }
 

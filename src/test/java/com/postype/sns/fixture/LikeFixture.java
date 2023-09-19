@@ -8,11 +8,7 @@ import java.time.Instant;
 
 public class LikeFixture {
 	public static Like get(Member member, Post post) {
-		Like like = new Like();
-		like.setId(1L);
-		like.setMember(member);
-		like.setPost(post);
-		like.setRegisteredAt(Timestamp.from(Instant.now()));
+		Like like = new Like(member, post);
 		return like;
 	}
 }

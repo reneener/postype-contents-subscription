@@ -6,12 +6,17 @@ import com.postype.sns.domain.member.domain.AlarmType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor
 @Getter
 public class AlarmDto {
 	private Long id;
 	private AlarmType alarmType;
 	private AlarmArgs alarmArgs;
+
+	public AlarmDto(Long id, AlarmType alarmType, AlarmArgs alarmArgs) {
+		this.id = id;
+		this.alarmType = alarmType;
+		this.alarmArgs = alarmArgs;
+	}
 
 	public static AlarmDto fromEntity(Alarm alarm){
 		return new AlarmDto(

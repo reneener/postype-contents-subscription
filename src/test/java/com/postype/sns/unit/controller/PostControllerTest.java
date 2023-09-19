@@ -64,9 +64,10 @@ public class PostControllerTest {
 		String body = "body";
 		String memberId = "memberId";
 		int price = 1000;
+		PostCreateRequest request = new PostCreateRequest(title, body, price);
 		Member writer = MemberFixture.get(memberId, "password", 1L);
 
-		when(postUseCase.execute(title, body, MemberDto.fromEntity(writer), price))
+		when(postUseCase.execute(request, MemberDto.fromEntity(writer)))
 			.thenReturn(PostFixture.get(memberId, 1L, 1L).getId());
 
 		mockMvc.perform(post("/api/v1/posts")
@@ -99,8 +100,9 @@ public class PostControllerTest {
 
 		String title = "title";
 		String body = "body";
-
-		when(postService.modify(eq(title), eq(body), any(), any()))
+		int price = 0;
+		PostModifyRequest request = new PostModifyRequest(title, body, price);
+		when(postService.modify(1L, request, any()))
 			.thenReturn(PostDto.fromPost(PostFixture.get("memberId", 1L, 1L)));
 
 		mockMvc.perform(put("/api/v1/posts/1")
@@ -132,8 +134,12 @@ public class PostControllerTest {
 
 		String title = "title";
 		String body = "body";
+		int price = 0;
+		PostModifyRequest request = new PostModifyRequest(title, body, price);
+
 		//반환 값이 없는 경우 when이 아닌 doThrow
-		doThrow(new ApplicationException(ErrorCode.INVALID_PERMISSION)).when(postService).modify(eq(title), eq(body), any(), eq(1L));
+		doThrow(new ApplicationException(ErrorCode.INVALID_PERMISSION))
+				.when(postService).modify(1L, request, any());
 
 		mockMvc.perform(put("/api/v1/posts/1")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -149,9 +155,12 @@ public class PostControllerTest {
 
 		String title = "title";
 		String body = "body";
+		int price = 0;
+		PostModifyRequest request = new PostModifyRequest(title, body, price);
 
 		//mocking
-		doThrow(new ApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).modify(eq(title), eq(body), any(), eq(1L));
+		doThrow(new ApplicationException(ErrorCode.POST_NOT_FOUND))
+				.when(postService).modify(1L, request, any());
 
 
 		mockMvc.perform(put("/api/v1/posts/1")

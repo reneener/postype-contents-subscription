@@ -13,16 +13,18 @@ import com.postype.sns.domain.member.repository.FollowRepository;
 import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.global.utill.AlarmProducer;
 import java.util.List;
-import javax.transaction.Transactional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class FollowService {
 
 	private final FollowRepository followRepository;
@@ -38,8 +40,13 @@ public class FollowService {
 		if(fromMember.getId() == toMember.getId())
 			throw new ApplicationException(ErrorCode.MEMBER_IS_SAME);
 
+		Follow newFollow = Follow.builder()
+				.fromMember(fromMember)
+				.toMember(toMember)
+				.build();
+
 		//follow save
-		Follow follow = followRepository.save(Follow.of(fromMember, toMember));
+		Follow follow = followRepository.save(newFollow);
 
 		alarmProducer.send(new AlarmEvent(toMember.getId(), //알람을 받는 팔로 대상자의 아이디
 				AlarmType.NEW_SUBSCRIBE_ON_MEMBER,
@@ -58,7 +65,9 @@ public class FollowService {
 	//해당 멤버를 팔로잉 하고 있는 멤버들의 목록을 반환
 	public List<FollowDto> getFollowers(MemberDto toMember){
 		Member member = getMemberOrException(toMember.getMemberId());
-		return followRepository.findAllByToMemberId(member.getId()).stream().map(FollowDto::fromEntity).toList();
+		return followRepository.findAllByToMemberId(member.getId()).stream()
+				.map(FollowDto::fromEntity)
+				.collect(Collectors.toList());
 	}
 
 	private Member getMemberOrException(String memberId){

@@ -13,5 +13,4 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	Optional<Member> findByMemberId(String memberId);
 	@Query(nativeQuery = true, value = "SELECT * FROM MEMBER as p WHERE p.id in :ids")
 	List<Member> findAllByIds(@Param("ids") List<Long> ids);
-
 }

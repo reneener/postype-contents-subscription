@@ -13,48 +13,58 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "\"post\"")
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE post SET deleted_at = NOW() where id = ?")
 @Where(clause = "deleted_at is NULL")
 public class Post extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	private String title;
+
 	@Column(columnDefinition = "TEXT")
 	private String body;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name= "member_id")
 	private Member member;
+
 	@Column(name="price")
 	private Point price;
 
-	public static Post of(String title, String body, Member member, int price){
-		Post post = new Post();
-		post.setTitle(title);
-		post.setBody(body);
-		post.setMember(member);
-		post.setPrice(new Point(price));
-		return post;
+	@Column(name = "deleted_at")
+	private LocalDateTime deletedAt;
+	@Builder
+	public Post(String title, String body, Member member, Point price) {
+		this.title = title;
+		this.body = body;
+		this.member = member;
+		this.price = price;
 	}
-	public static Post of(PostDto dto){
-		Post post = new Post();
-		post.setId(dto.getId());
-		post.setTitle(dto.getTitle());
-		post.setBody(dto.getBody());
-		post.setMember(Member.fromDto(dto.getMember()));
-		post.setPrice(new Point(dto.getPrice()));
-		return post;
+
+	public static Post fromDto(PostDto dto){
+		return Post.builder()
+				.title(dto.getTitle())
+				.body(dto.getBody())
+				.member(Member.fromDto(dto.getMember()))
+				.price(new Point(dto.getPrice()))
+				.build();
+	}
+
+	public void modify(String title, String body){
+		this.title = title;
+		this.body = body;
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.postype.sns.domain.post.dto.response;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import com.postype.sns.domain.post.dto.CommentDto;
 import lombok.AllArgsConstructor;
@@ -13,8 +14,8 @@ public class CommentResponse {
 	private String memberId;
 	private Long postId;
 	private String comment;
-	private Timestamp registeredAt;
-	private Timestamp updatedAt;
+	private LocalDateTime registeredAt;
+	private LocalDateTime updatedAt;
 
 	public static CommentResponse fromDto(CommentDto comment){
 		return new CommentResponse(

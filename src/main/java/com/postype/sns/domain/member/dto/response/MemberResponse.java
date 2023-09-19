@@ -5,11 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class MemberResponse {
 
 	private Long id;
 	private String userName;
+
+	public MemberResponse(Long id, String userName) {
+		this.id = id;
+		this.userName = userName;
+	}
 
 	public static MemberResponse fromMemberDto(MemberDto member) {
 		return new MemberResponse(

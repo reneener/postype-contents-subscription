@@ -18,7 +18,7 @@ public class TimeLineService {
 
 	public void deliveryToTimeLine(Long postId, List<Long> toMemberIds){
 		List<TimeLine> timelines = toMemberIds.stream()
-				.map((memberId) -> TimeLine.builder().memberId(memberId).postId(postId).build())
+				.map((memberId) -> new TimeLine(memberId, postId))
 				.collect(Collectors.toList());
 
 		timeLineRepository.saveAll(timelines);

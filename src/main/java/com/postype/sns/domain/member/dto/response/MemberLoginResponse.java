@@ -4,8 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class MemberLoginResponse {
 	private String token;
 
+	public MemberLoginResponse(String token) {
+		this.token = token;
+	}
 }

@@ -5,11 +5,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class FollowResponse {
 	private Long id;
 	private Long fromMemberId;
 	private Long toMemberId;
+
+	public FollowResponse(Long id, Long fromMemberId, Long toMemberId) {
+		this.id = id;
+		this.fromMemberId = fromMemberId;
+		this.toMemberId = toMemberId;
+	}
 
 	public static FollowResponse fromFollowDto(FollowDto follow){
 		return new FollowResponse(

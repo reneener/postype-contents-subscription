@@ -35,19 +35,20 @@ public class MemberController {
 	@PostMapping("/register")
 	public Response<MemberRegisterResponse> register(@RequestBody MemberRegisterRequest request){
 		return Response.success(
-			MemberRegisterResponse.fromMemberDto(memberService.register(request.getMemberId(), request.getPassword(), request.getMemberName(), request.getEmail())));
+				MemberRegisterResponse.fromMemberDto(memberService.register(request)));
 	}
 	@Operation(summary = "로그인", description = "memberId와 password로 login 후 authorize를 위한 token 값을 받습니다")
 	@PostMapping("/login")
 	public Response<MemberLoginResponse> login(@RequestBody MemberLoginRequest request){
-		String token = memberService.login(request.getMemberId(), request.getPassword());
+		String token = memberService.login(request);
 		return Response.success(new MemberLoginResponse(token)); //dto <-> response 변환이 아닌 token값 반환
 	}
 	//TODO :: Alarm API description 추가
 	@GetMapping("/alarm")
 	public Response<Page<AlarmResponse>> getAlarm(@ApiIgnore @AuthenticationPrincipal MemberDto memberDto, Pageable pageable){
-		return Response.success(memberService.getAlarmList(memberDto, pageable).map(
-			AlarmResponse::fromDto));
+		return Response.success(
+				memberService.getAlarmList(memberDto, pageable)
+						.map(AlarmResponse::fromDto));
 	}
 	@GetMapping("/alarm/subscribe")
 	public SseEmitter subscribe(@ApiIgnore @AuthenticationPrincipal MemberDto memberDto){

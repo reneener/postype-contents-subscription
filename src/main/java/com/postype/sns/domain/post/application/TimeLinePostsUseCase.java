@@ -21,8 +21,13 @@ public class TimeLinePostsUseCase {
 
 	public PageCursor<Post> executeTimeLine(MemberDto member, CursorRequest request){//push
 		PageCursor<TimeLine> pagedTimeLines = timeLineService.getTimeLine(member.getId(), request);
-		List<Long> postIds = pagedTimeLines.getContents().stream().map(TimeLine::getPostId).collect(Collectors.toList());
+
+		List<Long> postIds = pagedTimeLines.getContents().stream()
+				.map(TimeLine::getPostId)
+				.collect(Collectors.toList());
+
 		List<Post> posts = postService.getPostsByIds(postIds);
+
 		return new PageCursor(pagedTimeLines.getNextCursorRequest(), posts);
 	}
 

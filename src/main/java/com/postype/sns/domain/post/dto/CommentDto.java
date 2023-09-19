@@ -2,6 +2,8 @@ package com.postype.sns.domain.post.dto;
 
 import com.postype.sns.domain.post.domain.Comment;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,9 +14,9 @@ public class CommentDto {
 	private String memberId;
 	private Long postId;
 	private String comment;
-	private Timestamp registeredAt;
-	private Timestamp updatedAt;
-	private Timestamp deletedAt;
+	private LocalDateTime registeredAt;
+	private LocalDateTime updatedAt;
+	private LocalDateTime deletedAt;
 
 	public static CommentDto fromEntity(Comment comment){
 		return new CommentDto(

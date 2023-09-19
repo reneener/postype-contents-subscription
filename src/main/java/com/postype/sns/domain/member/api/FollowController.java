@@ -21,6 +21,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @RestController
 @RequestMapping("/api/v1/follow")
 @RequiredArgsConstructor
+//TODO :: 팔로우 취소
 public class FollowController {
 
 	private final FollowService followService;
@@ -38,7 +39,9 @@ public class FollowController {
 	@Operation(summary = "팔로잉 리스트 가져오기", description = "로그인한 멤버의 팔로잉 리스트를 가져옵니다")
 	@GetMapping
 	public Response<Page<FollowResponse>> getFollowList(@ApiIgnore @AuthenticationPrincipal MemberDto memberDto, Pageable pageable){
-		return Response.success(followService.getFollowList(memberDto, pageable).map(FollowResponse::fromFollowDto));
+		return Response.success(
+				followService.getFollowList(memberDto, pageable)
+						.map(FollowResponse::fromFollowDto));
 	}
 
 }

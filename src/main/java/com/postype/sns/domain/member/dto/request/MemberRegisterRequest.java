@@ -5,12 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
 public class MemberRegisterRequest{
-
 	private String memberId;
 	private String password;
 	private String memberName;
 	private String email;
+
+	public MemberRegisterRequest(String memberId, String password, String memberName, String email) {
+		this.memberId = memberId;
+		this.password = password;
+		this.memberName = memberName;
+		this.email = email;
+	}
 }

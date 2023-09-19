@@ -5,6 +5,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.postype.sns.domain.member.dto.MemberDto;
+import com.postype.sns.domain.post.dto.request.PostCreateRequest;
+import com.postype.sns.domain.post.dto.request.PostModifyRequest;
 import com.postype.sns.global.common.ErrorCode;
 import com.postype.sns.global.exception.ApplicationException;
 import com.postype.sns.domain.post.domain.Comment;
@@ -52,7 +54,7 @@ public class PostServiceTest {
 		String body = "body";
 		String memberId = "memberId";
 		int price = 1000;
-
+		PostCreateRequest request = new PostCreateRequest(title, body, price);
 		Member member = MemberFixture.get(memberId, "password", 1L);
 		MemberDto memberDto = MemberDto.fromEntity(member);
 
@@ -60,7 +62,7 @@ public class PostServiceTest {
 		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(mock(Member.class)));
 		when(postRepository.save(any())).thenReturn(mock(Post.class));
 
-		Assertions.assertDoesNotThrow(() -> postService.create(title, body, memberDto, price));
+		Assertions.assertDoesNotThrow(() -> postService.create(request, memberDto));
 	}
 
 	@Test
@@ -68,9 +70,11 @@ public class PostServiceTest {
 	void PostModifySuccess(){
 		String title = "title";
 		String body = "body";
-		String memberId = "memberId";
-		Long postId = 1L;
+		int price = 0;
+		PostModifyRequest request = new PostModifyRequest(title, body, price);
 
+		Long postId = 1L;
+		String memberId = "memberId";
 		Post post = PostFixture.get(memberId, postId, 1L);
 		Member member = post.getMember();
 
@@ -78,7 +82,7 @@ public class PostServiceTest {
 		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 		when(postRepository.saveAndFlush(any())).thenReturn(post);
 
-		Assertions.assertDoesNotThrow(() -> postService.modify(title, body, MemberDto.fromEntity(member), postId));
+		Assertions.assertDoesNotThrow(() -> postService.modify(postId, request, MemberDto.fromEntity(member)));
 	}
 	@Test
 	@DisplayName("포스트 수정 시 작성자와 수정자가 다를 경우 실패 테스트")
@@ -86,6 +90,8 @@ public class PostServiceTest {
 		String title = "title";
 		String body = "body";
 		String memberId = "memberId";
+		int price = 0;
+		PostModifyRequest request = new PostModifyRequest(title, body, price);
 		Long postId = 1L;
 
 		//mocking
@@ -97,7 +103,7 @@ public class PostServiceTest {
 		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
 		ApplicationException e = Assertions.assertThrows(
-			ApplicationException.class, () -> postService.modify(title, body, MemberDto.fromEntity(modifier), postId));
+			ApplicationException.class, () -> postService.modify(postId, request, MemberDto.fromEntity(modifier)));
 		Assertions.assertEquals(ErrorCode.INVALID_PERMISSION, e.getErrorCode());
 	}
 	@Test
@@ -107,6 +113,8 @@ public class PostServiceTest {
 		String body = "body";
 		String memberId = "memberId";
 		Long postId = 1L;
+		int price = 0;
+		PostModifyRequest request = new PostModifyRequest(title, body, price);
 
 		//mocking
 		Post post = PostFixture.get(memberId, postId, 1L);
@@ -116,7 +124,7 @@ public class PostServiceTest {
 		when(postRepository.findById(postId)).thenReturn(Optional.empty());
 
 		ApplicationException e = Assertions.assertThrows(
-			ApplicationException.class, () -> postService.modify(title, body, MemberDto.fromEntity(member), postId));
+			ApplicationException.class, () -> postService.modify(postId, request, MemberDto.fromEntity(member)));
 		Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, e.getErrorCode());
 	}
 
@@ -209,7 +217,7 @@ public class PostServiceTest {
 		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
 		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 		when(likeRepository.findAllByMemberAndPost(any(), any())).thenReturn(Optional.empty());
-		when(likeRepository.save(Like.of(member, post))).thenReturn(mock(Like.class));
+		when(likeRepository.save(new Like(member, post))).thenReturn(mock(Like.class));
 
 		Assertions.assertDoesNotThrow(() -> postService.like(postId, MemberDto.fromEntity(member)));
 	}
@@ -285,7 +293,7 @@ public class PostServiceTest {
 
 		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
 		when(postRepository.findById(postId)).thenReturn(Optional.empty());
-		when(commentRepository.save(Comment.of(member, post, comment))).thenReturn(mock(Comment.class));
+		when(commentRepository.save(new Comment(member, post, comment))).thenReturn(mock(Comment.class));
 
 		ApplicationException e = Assertions.assertThrows(
 			ApplicationException.class, () -> postService.comment(postId, MemberDto.fromEntity(member), comment));

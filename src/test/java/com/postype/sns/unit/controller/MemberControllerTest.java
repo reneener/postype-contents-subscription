@@ -48,7 +48,9 @@ public class MemberControllerTest {
 		String memberName = "memberName";
 		String email = "email";
 
-		when(memberService.register(memberId, password, memberName, email)).thenReturn(mock(MemberDto.class));
+		MemberRegisterRequest request = new MemberRegisterRequest(memberId, password, memberName, email);
+
+		when(memberService.register(request)).thenReturn(mock(MemberDto.class));
 
 		mockMvc.perform(post("/api/v1/members/register")
 			.contentType(MediaType.APPLICATION_JSON)
@@ -65,7 +67,9 @@ public class MemberControllerTest {
 		String memberName = "memberName";
 		String email = "email";
 
-		when(memberService.register(memberId, password, memberName, email)).thenThrow(new ApplicationException(ErrorCode.DUPLICATED_MEMBER_ID));
+		MemberRegisterRequest request = new MemberRegisterRequest(memberId, password, memberName, email);
+
+		when(memberService.register(request)).thenThrow(new ApplicationException(ErrorCode.DUPLICATED_MEMBER_ID));
 
 		mockMvc.perform(post("/api/v1/members/register")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -81,8 +85,9 @@ public class MemberControllerTest {
 	public void loginSuccess() throws java.lang.Exception {
 		String memberId = "memberId";
 		String password = "password";
+		MemberLoginRequest request = new MemberLoginRequest(memberId, password);
 
-		when(memberService.login(memberId, password)).thenReturn("testToken");
+		when(memberService.login(request)).thenReturn("testToken");
 
 		mockMvc.perform(post("/api/v1/members/login")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -96,8 +101,9 @@ public class MemberControllerTest {
 	public void loginFailCausedByNotFoundedId() throws java.lang.Exception {
 		String memberId = "name";
 		String password = "password";
+		MemberLoginRequest request = new MemberLoginRequest(memberId, password);
 
-		when(memberService.login(memberId, password)).thenThrow(new ApplicationException(ErrorCode.MEMBER_NOT_FOUND));
+		when(memberService.login(request)).thenThrow(new ApplicationException(ErrorCode.MEMBER_NOT_FOUND));
 
 		mockMvc.perform(post("/api/v1/members/login")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -112,8 +118,9 @@ public class MemberControllerTest {
 	public void loginFailCausedByWrongPassword() throws java.lang.Exception {
 		String memberId = "name";
 		String password = "password";
+		MemberLoginRequest request = new MemberLoginRequest(memberId, password);
 
-		when(memberService.login(memberId, password)).thenThrow(new ApplicationException(ErrorCode.INVALID_PASSWORD));
+		when(memberService.login(request)).thenThrow(new ApplicationException(ErrorCode.INVALID_PASSWORD));
 
 		mockMvc.perform(post("/api/v1/members/login")
 				.contentType(MediaType.APPLICATION_JSON)

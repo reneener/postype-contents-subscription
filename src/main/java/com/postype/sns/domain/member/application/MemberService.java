@@ -1,6 +1,8 @@
 package com.postype.sns.domain.member.application;
 
 import com.postype.sns.domain.member.dto.AlarmDto;
+import com.postype.sns.domain.member.dto.request.MemberLoginRequest;
+import com.postype.sns.domain.member.dto.request.MemberRegisterRequest;
 import com.postype.sns.global.common.ErrorCode;
 import com.postype.sns.global.exception.ApplicationException;
 import com.postype.sns.domain.member.dto.MemberDto;
@@ -8,16 +10,17 @@ import com.postype.sns.domain.member.domain.Member;
 import com.postype.sns.domain.member.repository.AlarmRepository;
 import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.global.utill.JwtTokenUtils;
-import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MemberService {
 	private final MemberRepository memberRepository;
 	private final AlarmRepository alarmRepository;
@@ -40,28 +43,29 @@ public class MemberService {
 	}
 
 	@Transactional
-	public MemberDto register(String memberId, String password, String memberName, String email) {
+	public MemberDto register(MemberRegisterRequest request) {
 
-		memberRepository.findByMemberId(memberId).ifPresent(it -> {
+		memberRepository.findByMemberId(request.getMemberId()).ifPresent(it -> {
 			throw new ApplicationException(ErrorCode.DUPLICATED_MEMBER_ID);
 		});
 
-		Member savedMember = memberRepository.save(Member.of(memberId, encoder.encode(password), memberName, email));
+		Member requestMember = Member.builder()
+				.memberId(request.getMemberId())
+				.memberName(request.getMemberName())
+				.password(encoder.encode(request.getPassword()))
+				.email(request.getEmail())
+				.build();
 
-		return MemberDto.fromEntity(savedMember);
+		return MemberDto.fromEntity(memberRepository.save(requestMember));
 	}
 
-	public String login(String memberId, String password) {
-		Member member = getMemberOrException(memberId);
+	public String login(MemberLoginRequest request) {
+		Member member = getMemberOrException(request.getMemberId());
 
-		//if(!member.getPassword().equals(password)) 인코딩 전
-		if(!encoder.matches(password, member.getPassword()))
+		if(!encoder.matches(request.getPassword(), member.getPassword()))
 			throw new ApplicationException(ErrorCode.INVALID_PASSWORD);
 
-		//token
-		String token = JwtTokenUtils.generateToken(memberId, secretKey, expiredTimeMs);
-
-		return token;
+		return JwtTokenUtils.generateToken(request.getMemberId(), secretKey, expiredTimeMs);
 	}
 
 	public Page<AlarmDto> getAlarmList(MemberDto memberDto, Pageable pageable){

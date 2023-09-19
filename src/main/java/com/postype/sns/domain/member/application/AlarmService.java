@@ -15,11 +15,13 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class AlarmService {
 
 	private final static Long DEFAULT_TIMEOUT = 60 * 1000 * 60L;
@@ -29,14 +31,23 @@ public class AlarmService {
 	private final AlarmRepository alarmRepository;
 	private final MemberRepository memberRepository;
 
+	@Transactional
 	public void send(AlarmType type, AlarmArgs args, Long receiveMemberId){
-		Member member = memberRepository.findById(receiveMemberId).orElseThrow(() -> new ApplicationException(ErrorCode.MEMBER_NOT_FOUND));
-		//alarm save
-		Alarm alarm = alarmRepository.save(Alarm.of(member, type, args));
+		Member member = memberRepository.findById(receiveMemberId).orElseThrow(()
+				-> new ApplicationException(ErrorCode.MEMBER_NOT_FOUND));
+
+		Alarm alarm = alarmRepository.save(Alarm.builder()
+						.member(member)
+						.type(type)
+						.args(args)
+						.build());
 
 		emitterRepository.get(receiveMemberId).ifPresentOrElse(sseEmitter -> {
 			try{
-				sseEmitter.send(SseEmitter.event().id(alarm.getId().toString()).name(ALARM_NAME).data("new alarm"));
+				sseEmitter.send(SseEmitter.event()
+						.id(alarm.getId().toString())
+						.name(ALARM_NAME)
+						.data("new alarm"));
 			}catch (IOException e) {
 				emitterRepository.delete(receiveMemberId);
 				throw new ApplicationException(ErrorCode.ALARM_CONNECT_ERROR);
@@ -49,7 +60,11 @@ public class AlarmService {
 		//alarm save
 		for(int i=0; i< receivedMemberIds.size(); i++){
 			List<Member> member = memberRepository.findAllByIds(receivedMemberIds);
-			alarmList.add(Alarm.of(member.get(i), type, args));
+			alarmList.add(Alarm.builder()
+					.member(member.get(i))
+					.type(type)
+					.args(args)
+					.build());
 		}
 		List<Alarm> alarms = alarmRepository.saveAll(alarmList);
 
