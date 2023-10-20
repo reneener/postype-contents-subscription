@@ -16,21 +16,22 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
 public class MemberDto implements UserDetails {
-	private Long id;
-	private String memberId;
-	private String password;
-	private String memberName;
-	private String email;
-	private MemberRole role;
-	private LocalDateTime registerAt;
-	private LocalDateTime updatedAt;
-	private Boolean isDeleted;
+	private final Long id;
+	private final String memberId;
+	private final String password;
+	private final String memberName;
+	private final String email;
+	private final MemberRole role;
+	private final LocalDateTime registerAt;
+	private final LocalDateTime updatedAt;
+	private final Boolean isDeleted;
 
 	@Builder
-	public MemberDto(Long id, String memberId, String memberName, String email, MemberRole role,
+	public MemberDto(Long id, String memberId, String password, String memberName, String email, MemberRole role,
 					 LocalDateTime registerAt, LocalDateTime updatedAt, Boolean isDeleted) {
 		this.id = id;
 		this.memberId = memberId;
+		this.password = password;
 		this.memberName = memberName;
 		this.email = email;
 		this.role = role;
@@ -39,10 +40,10 @@ public class MemberDto implements UserDetails {
 		this.isDeleted = isDeleted;
 	}
 
-
 	public static MemberDto fromEntity(Member member){
 		return MemberDto.builder()
 				.id(member.getId())
+				.password(member.getPassword())
 				.memberId(member.getMemberId())
 				.memberName(member.getMemberName())
 				.email(member.getEmail())
@@ -62,21 +63,21 @@ public class MemberDto implements UserDetails {
 	}
 	@Override
 	public boolean isAccountNonExpired() {
-		return this.isDeleted == false;
+		return !this.isDeleted;
 	}
 
 	@Override
 	public boolean isAccountNonLocked() {
-		return this.isDeleted == false;
+		return !this.isDeleted;
 	}
 
 	@Override
 	public boolean isCredentialsNonExpired() {
-		return this.isDeleted == false;
+		return !this.isDeleted;
 	}
 
 	@Override
 	public boolean isEnabled() {
-		return this.isDeleted == false;
+		return !this.isDeleted;
 	}
 }

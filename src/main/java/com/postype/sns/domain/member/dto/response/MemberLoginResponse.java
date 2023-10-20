@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class MemberLoginResponse {
-	private String token;
+	private final String token;
 
 	public MemberLoginResponse(String token) {
 		this.token = token;

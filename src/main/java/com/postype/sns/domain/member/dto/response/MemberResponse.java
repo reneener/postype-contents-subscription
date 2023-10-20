@@ -7,8 +7,8 @@ import lombok.Getter;
 @Getter
 public class MemberResponse {
 
-	private Long id;
-	private String userName;
+	private final Long id;
+	private final String userName;
 
 	public MemberResponse(Long id, String userName) {
 		this.id = id;
