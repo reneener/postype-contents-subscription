@@ -4,11 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PositiveOrZero;
+
 @Getter
 @NoArgsConstructor
 public class PostCreateRequest {
+	@NotBlank(message = "포스트 제목을 입력해주세요")
 	private String title;
+
+	@NotBlank(message = "포스트 내용을 입력해주세요")
 	private String body;
+
+	@PositiveOrZero
 	private int price;
 
 	public PostCreateRequest(String title, String body, int price) {
