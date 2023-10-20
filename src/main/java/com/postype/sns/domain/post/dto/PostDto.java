@@ -2,14 +2,12 @@ package com.postype.sns.domain.post.dto;
 
 import com.postype.sns.domain.member.dto.MemberDto;
 import com.postype.sns.domain.post.domain.Post;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class PostDto {
 
 	private Long id;
@@ -21,6 +19,18 @@ public class PostDto {
 	private LocalDateTime updatedAt;
 	private LocalDateTime deletedAt;
 
+	@Builder
+	public PostDto(Long id, String title, String body, MemberDto member, int price,
+				   LocalDateTime registeredAt, LocalDateTime updatedAt, LocalDateTime deletedAt) {
+		this.id = id;
+		this.title = title;
+		this.body = body;
+		this.member = member;
+		this.price = price;
+		this.registeredAt = registeredAt;
+		this.updatedAt = updatedAt;
+		this.deletedAt = deletedAt;
+	}
 
 	public static PostDto fromPost(Post post){
 		return new PostDto(
