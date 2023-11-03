@@ -1,6 +1,6 @@
 package com.postype.sns.domain.member.domain;
 
-import com.postype.sns.domain.BaseEntity;
+import com.postype.sns.global.common.BaseEntity;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -11,8 +11,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "follow")

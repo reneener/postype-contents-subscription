@@ -1,7 +1,7 @@
 package com.postype.sns.domain.member.domain;
 
 import com.postype.sns.domain.member.dto.MemberDto;
-import com.postype.sns.domain.BaseEntity;
+import com.postype.sns.global.common.BaseEntity;
 import com.postype.sns.domain.order.domain.Order;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +18,6 @@ import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 @Entity
@@ -69,6 +67,9 @@ public class Member extends BaseEntity {
 				.email(dto.getEmail())
 				.role(dto.getRole())
 				.build();
+	}
+	public void setPassword(String encodedPassword){
+		password = encodedPassword;
 	}
 
 }

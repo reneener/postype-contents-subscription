@@ -1,4 +1,4 @@
-package com.postype.sns.domain;
+package com.postype.sns.global.common;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;

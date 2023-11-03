@@ -1,6 +1,6 @@
 package com.postype.sns.domain.member.domain;
 
-import com.postype.sns.domain.BaseEntity;
+import com.postype.sns.global.common.BaseEntity;
 import com.vladmihalcea.hibernate.type.json.JsonType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,10 +17,8 @@ import javax.persistence.Table;
 
 import lombok.*;
 
-import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "\"alarm\"", indexes = {

@@ -1,7 +1,7 @@
 package com.postype.sns.domain.post.domain;
 
 import com.postype.sns.domain.post.dto.PostDto;
-import com.postype.sns.domain.BaseEntity;
+import com.postype.sns.global.common.BaseEntity;
 import com.postype.sns.domain.member.domain.Member;
 import com.postype.sns.domain.order.domain.Point;
 import javax.persistence.Column;
