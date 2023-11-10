@@ -1,8 +1,7 @@
-package com.postype.sns.unit.controller;
+package com.postype.sns.integration;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -11,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.postype.sns.domain.member.dto.request.MemberLoginRequest;
 import com.postype.sns.domain.member.dto.request.MemberRegisterRequest;
+import com.postype.sns.fixture.MemberFixture;
 import com.postype.sns.global.common.ErrorCode;
 import com.postype.sns.global.exception.ApplicationException;
 import com.postype.sns.domain.member.dto.MemberDto;
@@ -25,10 +25,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc //컨트롤러 api 테스트
+@ActiveProfiles("test")
 public class MemberControllerTest {
 
 	@Autowired
@@ -39,22 +41,17 @@ public class MemberControllerTest {
 
 	@MockBean
 	private MemberService memberService;
+
 	@Test
 	@DisplayName("회원 가입 성공 테스트")
-	@WithAnonymousUser
 	public void registerSuccess() throws java.lang.Exception {
-		String memberId = "memberId";
-		String password = "password";
-		String memberName = "memberName";
-		String email = "email";
+		MemberRegisterRequest request = MemberFixture.getRegisterCreateRequest();
 
-		MemberRegisterRequest request = new MemberRegisterRequest(memberId, password, memberName, email);
-
-		when(memberService.register(request)).thenReturn(mock(MemberDto.class));
+		when(memberService.register(any())).thenReturn(mock(MemberDto.class));
 
 		mockMvc.perform(post("/api/v1/members/register")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(objectMapper.writeValueAsBytes(new MemberRegisterRequest(memberId, password, memberName, email)))
+			.content(objectMapper.writeValueAsBytes(request))
 		).andDo(print())
 			.andExpect(status().isOk());
 	}
@@ -62,19 +59,13 @@ public class MemberControllerTest {
 	@Test
 	@DisplayName("이미 가입된 memberId일 경우 회원가입 실패 테스트")
 	public void registerFailCausedByDuplicatedId() throws java.lang.Exception {
-		String memberId = "memberId";
-		String password = "password";
-		String memberName = "memberName";
-		String email = "email";
+		MemberRegisterRequest request = MemberFixture.getRegisterCreateRequest();
 
-		MemberRegisterRequest request = new MemberRegisterRequest(memberId, password, memberName, email);
-
-		when(memberService.register(request)).thenThrow(new ApplicationException(ErrorCode.DUPLICATED_MEMBER_ID));
+		when(memberService.register(any())).thenThrow(new ApplicationException(ErrorCode.DUPLICATED_MEMBER_ID));
 
 		mockMvc.perform(post("/api/v1/members/register")
 				.contentType(MediaType.APPLICATION_JSON)
-				// TODO : add request body
-			.content(objectMapper.writeValueAsBytes(new MemberRegisterRequest(memberId, password, memberName, email)))
+			.content(objectMapper.writeValueAsBytes(request))
 		).andDo(print())
 			.andExpect(status().isConflict());
 
@@ -83,15 +74,12 @@ public class MemberControllerTest {
 	@Test
 	@DisplayName("로그인 성공 테스트")
 	public void loginSuccess() throws java.lang.Exception {
-		String memberId = "memberId";
-		String password = "password";
-		MemberLoginRequest request = new MemberLoginRequest(memberId, password);
-
-		when(memberService.login(request)).thenReturn("testToken");
+		MemberLoginRequest request = MemberFixture.getLoginRequest();
+		when(memberService.login(request)).thenReturn("accessToken");
 
 		mockMvc.perform(post("/api/v1/members/login")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsBytes(new MemberLoginRequest(memberId, password)))
+				.content(objectMapper.writeValueAsBytes(request))
 			).andDo(print())
 			.andExpect(status().isOk());
 	}
@@ -99,42 +87,35 @@ public class MemberControllerTest {
 	@Test
 	@DisplayName("MemberId를 찾지 못해 로그인 실패 테스트")
 	public void loginFailCausedByNotFoundedId() throws java.lang.Exception {
-		String memberId = "name";
-		String password = "password";
-		MemberLoginRequest request = new MemberLoginRequest(memberId, password);
+		MemberLoginRequest request = MemberFixture.getLoginRequest();
 
-		when(memberService.login(request)).thenThrow(new ApplicationException(ErrorCode.MEMBER_NOT_FOUND));
+		doThrow(new ApplicationException(ErrorCode.MEMBER_NOT_FOUND))
+				.when(memberService).login(any());
 
 		mockMvc.perform(post("/api/v1/members/login")
 				.contentType(MediaType.APPLICATION_JSON)
-				// TODO : add request body
-				.content(objectMapper.writeValueAsBytes(new MemberLoginRequest("name", "password")))
+				.content(objectMapper.writeValueAsBytes(request))
 			).andDo(print())
-			.andExpect(status().is(ErrorCode.MEMBER_NOT_FOUND.getStatus().value()));
+			.andExpect(status().isNotFound());
 	}
 
 	@Test
 	@DisplayName("잘못된 패스워드 입력으로 로그인 실패 테스트")
 	public void loginFailCausedByWrongPassword() throws java.lang.Exception {
-		String memberId = "name";
-		String password = "password";
-		MemberLoginRequest request = new MemberLoginRequest(memberId, password);
-
-		when(memberService.login(request)).thenThrow(new ApplicationException(ErrorCode.INVALID_PASSWORD));
+		MemberLoginRequest request = MemberFixture.getLoginRequest();
+		when(memberService.login(any())).thenThrow(new ApplicationException(ErrorCode.INVALID_PASSWORD));
 
 		mockMvc.perform(post("/api/v1/members/login")
 				.contentType(MediaType.APPLICATION_JSON)
-				// TODO : add request body
-				.content(objectMapper.writeValueAsBytes(new MemberLoginRequest(memberId, password)))
+				.content(objectMapper.writeValueAsBytes(request))
 			).andDo(print())
-			.andExpect(status().is(ErrorCode.INVALID_PASSWORD.getStatus().value()));
+			.andExpect(status().isUnauthorized());
 	}
 
 	@Test
 	@WithMockUser
 	@DisplayName("알람 리스트 가져오기 성공 테스트")
 	public void getAlarmSuccessTest() throws Exception {
-
 		when(memberService.getAlarmList(any(), any())).thenReturn(Page.empty());
 
 		mockMvc.perform(get("/api/v1/members/alarm")

@@ -1,4 +1,4 @@
-package com.postype.sns.unit.controller;
+package com.postype.sns.integration;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -22,10 +22,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class FollowControllerTest {
 
 	@Autowired
@@ -58,7 +60,6 @@ public class FollowControllerTest {
 	@DisplayName("팔로우 시 로그인 하지 않은 경우 실패 테스트")
 	@WithAnonymousUser
 	void followFailCausedByNotLoginMember() throws java.lang.Exception {
-
 		mockMvc.perform(post("/api/v1/follow/test03")
 				.contentType(MediaType.APPLICATION_JSON)
 			).andDo(print())
@@ -68,7 +69,6 @@ public class FollowControllerTest {
 	@WithMockUser
 	@DisplayName("팔로우 할 멤버가 존재 하지 않아 팔로우 요청 실패 테스트")
 	void followFailCausedNotFoundedMember() throws Exception {
-
 		when(followService.create(any(), any())).thenThrow(new ApplicationException(ErrorCode.MEMBER_NOT_FOUND));
 
 		mockMvc.perform(post("/api/v1/follow/test03")
