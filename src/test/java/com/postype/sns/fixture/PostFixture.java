@@ -3,7 +3,6 @@ package com.postype.sns.fixture;
 import com.postype.sns.domain.member.domain.Member;
 import com.postype.sns.domain.order.domain.Point;
 import com.postype.sns.domain.post.domain.Post;
-import com.postype.sns.domain.post.dto.request.PostCommentRequest;
 import com.postype.sns.domain.post.dto.request.PostCreateRequest;
 import com.postype.sns.domain.post.dto.request.PostModifyRequest;
 
@@ -37,8 +36,5 @@ public class PostFixture {
 				.body("create")
 				.price(1000)
 				.build();
-	}
-	public static PostCommentRequest getCommentCreateRequest(){
-		return new PostCommentRequest("comment");
 	}
 }
