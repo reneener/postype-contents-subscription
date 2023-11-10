@@ -221,19 +221,18 @@ public class PostServiceTest {
 		when(commentRepository.save(any())).thenReturn(mock(Comment.class));
 		doNothing().when(alarmProducer).send(any());
 
-		Assertions.assertDoesNotThrow(() -> postService.comment(anyLong(), MemberDto.fromEntity(writer), anyString()));
+		Assertions.assertDoesNotThrow(() -> postService.comment(anyLong(), MemberDto.fromEntity(writer), "comment"));
 	}
 
 	@Test
 	@DisplayName("코멘트를 등록할 떄 포스트가 존재하지 않는 경우 실패 테스트")
 	void CommentCreateFailCausedByNotFoundedPost(){
-		Post post = PostFixture.get();
 		Member writer = MemberFixture.get();
 
 		when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
 
 		ApplicationException e = Assertions.assertThrows(
-			ApplicationException.class, () -> postService.comment(anyLong(), MemberDto.fromEntity(writer), anyString()));
+			ApplicationException.class, () -> postService.comment(anyLong(), MemberDto.fromEntity(writer), "comment"));
 		Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, e.getErrorCode());
 	}
 
