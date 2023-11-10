@@ -1,8 +1,8 @@
 package com.postype.sns.unit.service;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 import com.postype.sns.domain.member.dto.request.MemberLoginRequest;
 import com.postype.sns.domain.member.dto.request.MemberRegisterRequest;
@@ -12,41 +12,46 @@ import com.postype.sns.domain.member.application.MemberService;
 import com.postype.sns.domain.member.domain.Member;
 import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.fixture.MemberFixture;
+
 import java.util.Optional;
+
+import com.postype.sns.global.utill.JwtTokenUtils;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
 
-	@Autowired
+	@InjectMocks
 	private MemberService memberService;
-
-	@MockBean
+	@Mock
 	private MemberRepository memberRepository;
-
-	@MockBean
+	@Mock
 	private BCryptPasswordEncoder encoder;
+
+	@BeforeEach
+	public void setUp(){
+		ReflectionTestUtils.setField(memberService, "expiredTimeMs", 60000L);
+		ReflectionTestUtils.setField(memberService, "secretKey", "2023-postype.sns-application-project.secret_key");
+	}
 
 	@Test
 	@DisplayName("회원가입 성공 테스트")
 	void registerOk(){
-		String memberId = "memberId";
-		String password = "password";
-		String memberName = "memberName";
-		String email = "email";
+		MemberRegisterRequest request = MemberFixture.getRegisterCreateRequest();
 
-		MemberRegisterRequest request = new MemberRegisterRequest(memberId, password, memberName, email);
-
-		//mocking
-		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.empty());
-		when(encoder.encode(password)).thenReturn("encrypt password");
-		when(memberRepository.save(any())).thenReturn(MemberFixture.get(memberId,password,1L));
+		when(memberRepository.findByMemberId(anyString())).thenReturn(Optional.empty());
+		when(encoder.encode(anyString())).thenReturn("encrypted password");
+		when(memberRepository.save(any())).thenReturn(mock(Member.class));
 
 		Assertions.assertDoesNotThrow(() -> memberService.register(request));
 	}
@@ -54,47 +59,37 @@ public class MemberServiceTest {
 	@Test
 	@DisplayName("회원가입 실패 테스트 - memberId가 이미 있는 경우")
 	void registerFailCausedByDuplicatedId(){
-		String memberId = "memberId";
-		String password = "password";
-		String memberName = "memberName";
-		String email = "email";
-		MemberRegisterRequest request = new MemberRegisterRequest(memberId, password, memberName, email);
+		MemberRegisterRequest request = MemberFixture.getRegisterCreateRequest();
 
-		Member fixture = MemberFixture.get(memberId, password, 1L);
-		//mocking
-		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(fixture));
-		when(encoder.encode(password)).thenReturn("encrypt password");
-		when(memberRepository.save(any())).thenReturn(Optional.of(fixture));
+		when(memberRepository.findByMemberId(anyString())).thenReturn(Optional.of(mock(Member.class)));
 
-	 	ApplicationException e =	Assertions.assertThrows(
-			ApplicationException.class, () -> memberService.register(request));
+	 	ApplicationException e = Assertions.assertThrows(
+				 ApplicationException.class, () -> memberService.register(request));
 		 Assertions.assertEquals(ErrorCode.DUPLICATED_MEMBER_ID, e.getErrorCode());
 	}
 
 	@Test
 	@DisplayName("로그인 성공 테스트")
 	void loginOk(){
-		String memberId = "memberId";
-		String password = "password";
-		MemberLoginRequest request = new MemberLoginRequest(memberId, password);
+		MemberLoginRequest request = MemberFixture.getLoginRequest();
+		Member registeredMember = MemberFixture.get();
 
-		Member fixture = MemberFixture.get(memberId, password, 1L);
-		//mocking member 객체로 하기 when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(mock(Member.classs)));
-		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(fixture));
-		when(encoder.matches(password, fixture.getPassword())).thenReturn(true);
+		when(memberRepository.findByMemberId(anyString())).thenReturn(Optional.of(registeredMember));
+		when(encoder.matches(any(), any())).thenReturn(true);
+		try(MockedStatic<JwtTokenUtils> jwtUtilsMock = mockStatic(JwtTokenUtils.class)) {
+			jwtUtilsMock.when(() -> JwtTokenUtils.generateToken(anyString(), anyString(), anyLong())).thenReturn("accessToken");
+			Assertions.assertDoesNotThrow(() -> memberService.login(request));
+		}
 
-		Assertions.assertDoesNotThrow(() -> memberService.login(request));
+
 	}
 
 	@Test
 	@DisplayName("로그인 실패 테스트 - memberId가 없는 경우")
 	void loginFailCausedByDuplicatedId(){
-		String memberId = "memberId";
-		String password = "password";
-		MemberLoginRequest request = new MemberLoginRequest(memberId, password);
+		MemberLoginRequest request = MemberFixture.getLoginRequest();
 
-		//mocking
-		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.empty());
+		when(memberRepository.findByMemberId(anyString())).thenReturn(Optional.empty());
 
 		ApplicationException e = Assertions.assertThrows(
 			ApplicationException.class, () -> memberService.login(request));
@@ -104,14 +99,9 @@ public class MemberServiceTest {
 	@Test
 	@DisplayName("로그인 실패 테스트 - password가 틀린 경우")
 	void loginFailCausedByWrongPassword(){
-		String memberId = "memberId";
-		String password = "password";
-		String wrongPassword = "wrongPassword";
-		MemberLoginRequest request = new MemberLoginRequest(memberId, wrongPassword);
-
-		Member fixture = MemberFixture.get(memberId, password, 1L);
-		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(fixture));
-
+		MemberLoginRequest request = MemberFixture.getLoginRequest();
+		when(memberRepository.findByMemberId(anyString())).thenReturn(Optional.of(mock(Member.class)));
+		when(encoder.matches(any(), any())).thenReturn(false);
 
 		ApplicationException e = Assertions.assertThrows(
 			ApplicationException.class, () -> memberService.login(request));

@@ -1,10 +1,11 @@
 package com.postype.sns.unit.service;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
+import com.postype.sns.domain.member.domain.Follow;
 import com.postype.sns.domain.member.dto.MemberDto;
+import com.postype.sns.domain.member.repository.FollowRepository;
 import com.postype.sns.domain.post.dto.request.PostCreateRequest;
 import com.postype.sns.domain.post.dto.request.PostModifyRequest;
 import com.postype.sns.global.common.ErrorCode;
@@ -14,174 +15,141 @@ import com.postype.sns.domain.post.domain.Like;
 import com.postype.sns.domain.post.repository.CommentRepository;
 import com.postype.sns.domain.post.repository.LikeRepository;
 import com.postype.sns.domain.member.domain.Member;
-import com.postype.sns.domain.member.repository.MemberRepository;
 import com.postype.sns.domain.post.domain.Post;
 import com.postype.sns.domain.post.repository.PostRepository;
 import com.postype.sns.domain.post.application.PostService;
 import com.postype.sns.fixture.LikeFixture;
 import com.postype.sns.fixture.MemberFixture;
 import com.postype.sns.fixture.PostFixture;
+
+import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
+
+import com.postype.sns.global.utill.AlarmProducer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class PostServiceTest {
 
-	@Autowired
+	@InjectMocks
 	private PostService postService;
-	@MockBean
+	@Mock
 	private PostRepository postRepository;
-	@MockBean
-	private MemberRepository memberRepository;
-	@MockBean
+	@Mock
 	private LikeRepository likeRepository;
-	@MockBean
+	@Mock
+	private FollowRepository followRepository;
+	@Mock
+	private AlarmProducer alarmProducer;
+	@Mock
 	private CommentRepository commentRepository;
 
 	@Test
 	@DisplayName("포스트 작성 성공 테스트")
 	void PostCreateSuccess(){
-		String title = "title";
-		String body = "body";
-		String memberId = "memberId";
-		int price = 1000;
-		PostCreateRequest request = new PostCreateRequest(title, body, price);
-		Member member = MemberFixture.get(memberId, "password", 1L);
-		MemberDto memberDto = MemberDto.fromEntity(member);
+		PostCreateRequest request = PostFixture.getCreateRequest();
+		Member writer = MemberFixture.get();
+		Member subscribedMember = MemberFixture.get("subscribe", "password");
+		List<Follow> list = List.of(Follow.builder()
+						.fromMember(subscribedMember)
+						.toMember(writer)
+				.build());
 
-		//mocking
-		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(mock(Member.class)));
 		when(postRepository.save(any())).thenReturn(mock(Post.class));
+		when(followRepository.findAllByToMemberId(any())).thenReturn(list);
+		doNothing().when(alarmProducer).send(any());
 
-		Assertions.assertDoesNotThrow(() -> postService.create(request, memberDto));
+		Assertions.assertDoesNotThrow(() -> postService.create(request, MemberDto.fromEntity(writer)));
 	}
 
 	@Test
 	@DisplayName("포스트 수정 성공 테스트")
 	void PostModifySuccess(){
-		String title = "title";
-		String body = "body";
-		int price = 0;
-		PostModifyRequest request = new PostModifyRequest(title, body, price);
+		PostModifyRequest request = PostFixture.getModifyRequest();
+		Member writer = MemberFixture.get();
+		Post post = PostFixture.get(writer);
 
-		Long postId = 1L;
-		String memberId = "memberId";
-		Post post = PostFixture.get(memberId, postId, 1L);
-		Member member = post.getMember();
-
-		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
-		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+		when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 		when(postRepository.saveAndFlush(any())).thenReturn(post);
 
-		Assertions.assertDoesNotThrow(() -> postService.modify(postId, request, MemberDto.fromEntity(member)));
+		Assertions.assertDoesNotThrow(() -> postService.modify(anyLong(), request, MemberDto.fromEntity(writer)));
 	}
 	@Test
 	@DisplayName("포스트 수정 시 작성자와 수정자가 다를 경우 실패 테스트")
 	void postModifyFailCausedByNotLoginMember(){
-		String title = "title";
-		String body = "body";
-		String memberId = "memberId";
-		int price = 0;
-		PostModifyRequest request = new PostModifyRequest(title, body, price);
-		Long postId = 1L;
+		PostModifyRequest request = PostFixture.getModifyRequest();
+		Member modifier = MemberFixture.get("modifier","password");
+		Member writer = MemberFixture.get();
+		Post post = PostFixture.get(writer);
 
-		//mocking
-		Post post = PostFixture.get(memberId, postId, 1L);
-		Member modifier = MemberFixture.get(memberId, "password", 2L);
-
-		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(post.getMember()));
-		when(memberRepository.findByMemberId(modifier.getMemberId())).thenReturn(Optional.of(modifier));
-		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+		when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 
 		ApplicationException e = Assertions.assertThrows(
-			ApplicationException.class, () -> postService.modify(postId, request, MemberDto.fromEntity(modifier)));
+			ApplicationException.class, () -> postService.modify(anyLong(), request, MemberDto.fromEntity(modifier)));
 		Assertions.assertEquals(ErrorCode.INVALID_PERMISSION, e.getErrorCode());
 	}
 	@Test
 	@DisplayName("포스트 수정 시 포스트가 존재 하지 않는 경우 실패 테스트")
 	void postModifyFailCausedByNotFoundedPost(){
-		String title = "title";
-		String body = "body";
-		String memberId = "memberId";
-		Long postId = 1L;
-		int price = 0;
-		PostModifyRequest request = new PostModifyRequest(title, body, price);
+		PostModifyRequest request = PostFixture.getModifyRequest();
+		Member writer = MemberFixture.get();
 
-		//mocking
-		Post post = PostFixture.get(memberId, postId, 1L);
-		Member member = post.getMember();
-
-		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member)); //포스트에 등록된 작성자와 멤버가 동일함을 명시
-		when(postRepository.findById(postId)).thenReturn(Optional.empty());
+		when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
 
 		ApplicationException e = Assertions.assertThrows(
-			ApplicationException.class, () -> postService.modify(postId, request, MemberDto.fromEntity(member)));
+			ApplicationException.class, () -> postService.modify(anyLong(), request, MemberDto.fromEntity(writer)));
 		Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, e.getErrorCode());
 	}
 
 	@Test
 	@DisplayName("포스트 삭제 성공 테스트")
 	void PostDeleteSuccess(){
-		String memberId = "memberId";
-		Long postId = 1L;
+		Member writer = MemberFixture.get();
+		Post post = PostFixture.get(writer);
 
-		//mocking
-		Post post = PostFixture.get(memberId, postId, 1L);
-		Member member = post.getMember();
+		when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+		doNothing().when(postRepository).delete(any());
 
-		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
-		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
-
-		Assertions.assertDoesNotThrow(() -> postService.delete(MemberDto.fromEntity(member), 1L));
+		Assertions.assertDoesNotThrow(() -> postService.delete(MemberDto.fromEntity(writer), anyLong()));
 	}
 	@Test
 	@DisplayName("포스트 삭제 시 권한이 없는 경우 실패 테스트")
 	void postDeleteFailCausedByNotLoginMember(){
-		String memberId = "memberId";
-		Long postId = 1L;
+		Member writer = MemberFixture.get();
+		Post post = PostFixture.get(writer);
+		Member requestMember = MemberFixture.get("requestMember", "password");
 
-		//mocking
-		Post post = PostFixture.get(memberId, postId, 1L);
-		Member deletedMember = MemberFixture.get(memberId, "password", 2L);
-
-		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(post.getMember()));
-		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+		when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 
 		ApplicationException e = Assertions.assertThrows(
-			ApplicationException.class, () -> postService.delete(MemberDto.fromEntity(deletedMember), 1L));
+			ApplicationException.class, () -> postService.delete(MemberDto.fromEntity(requestMember), anyLong()));
 		Assertions.assertEquals(ErrorCode.INVALID_PERMISSION, e.getErrorCode());
 	}
 	@Test
 	@DisplayName("포스트 삭제 시 포스트가 존재 하지 않는 경우 실패 테스트")
 	void postDeleteFailCausedByNotFoundedPost(){
-		String memberId = "memberId";
-		Long postId = 1L;
+		Member writer = MemberFixture.get();
 
-		//mocking
-		Post post = PostFixture.get(memberId, postId, 1L);
-		Member member = post.getMember();
-
-		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
-		when(postRepository.findById(postId)).thenReturn(Optional.empty());
+		when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
 
 		ApplicationException e = Assertions.assertThrows(
-			ApplicationException.class, () -> postService.delete(MemberDto.fromEntity(member), 1L));
+			ApplicationException.class, () -> postService.delete(MemberDto.fromEntity(writer), anyLong()));
 		Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, e.getErrorCode());
 	}
 
 	@Test
-	@DisplayName("피드 목록 조회 성공 테스트")
+	@DisplayName("인기 포스트 목록 조회 성공 테스트")
 	void FeedListSuccess(){
-
 		Pageable pageable = mock(Pageable.class);
 
 		when(postRepository.findAll(pageable)).thenReturn(Page.empty());
@@ -190,113 +158,82 @@ public class PostServiceTest {
 	}
 
 	@Test
-	@DisplayName("내 피드 목록 조회 성공 테스트")
+	@DisplayName("내 포스트 목록 조회 성공 테스트")
 	void MyFeedListSuccess(){
-
 		Pageable pageable = mock(Pageable.class);
 		Member member = mock(Member.class);
 
-		when(memberRepository.findByMemberId((any()))).thenReturn(Optional.of(member));
 		when(postRepository.findAllByMemberId(member.getId(), pageable)).thenReturn(Page.empty());
 
 		Assertions.assertDoesNotThrow(() -> postService.getMyPostList(MemberDto.fromEntity(member), pageable));
 	}
 
 	@Test
-	@WithMockUser
-	@Transactional
 	@DisplayName("포스트 좋아요 성공 테스트")
 	void LikeCreateSuccess(){
-		String memberId = "memberId";
-		Long postId = 1L;
+		Member requestMember = MemberFixture.get("request", "password");
+		Post post = PostFixture.get();
 
-		//mocking
-		Post post = PostFixture.get(memberId, postId, 1L);
-		Member member = MemberFixture.get(memberId, "password", 1L);
-
-		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
-		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+		when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 		when(likeRepository.findAllByMemberAndPost(any(), any())).thenReturn(Optional.empty());
-		when(likeRepository.save(new Like(member, post))).thenReturn(mock(Like.class));
+		when(likeRepository.save(any())).thenReturn(mock(Like.class));
+		doNothing().when(alarmProducer).send(any());
 
-		Assertions.assertDoesNotThrow(() -> postService.like(postId, MemberDto.fromEntity(member)));
+		Assertions.assertDoesNotThrow(() -> postService.like(anyLong(), MemberDto.fromEntity(requestMember)));
 	}
 
 	@Test
 	@WithMockUser
 	@DisplayName("이미 포스트의 좋아요를 클릭한 경우 실패 테스트")
 	void LikeCreateFailCausedByAlreadyLike(){
-		String memberId = "memberId";
-		Long postId = 1L;
+		Post post = PostFixture.get();
+		Member requestMember = MemberFixture.get("request", "password");
+		Like like = LikeFixture.get(requestMember, post);
 
-		//mocking
-		Post post = PostFixture.get(memberId, postId, 1L);
-		Member member = MemberFixture.get(memberId, "password", 1L);
-		Like like = LikeFixture.get(member, post);
-
-		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
-		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+		when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 		when(likeRepository.findAllByMemberAndPost(any(), any())).thenReturn(Optional.of(like));
-		when(likeRepository.save(any())).thenReturn(like);
 
 		ApplicationException e = Assertions.assertThrows(
-			ApplicationException.class, () -> postService.like(postId, MemberDto.fromEntity(member)));
+			ApplicationException.class, () -> postService.like(anyLong(), MemberDto.fromEntity(requestMember)));
 		Assertions.assertEquals(ErrorCode.ALREADY_LIKE, e.getErrorCode());
 	}
 
 	@Test
-	@WithMockUser
 	@DisplayName("좋아요를 누른 포스트가 존재하지 않는 경우 실패 테스트")
 	void LikeCreateFailCausedByNotFoundedPost(){
-		String memberId = "memberId";
-		Long postId = 1L;
-		Member member = MemberFixture.get(memberId, "password", 1L);
+		Member requestMember = MemberFixture.get("request", "password");
 
-		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
-		when(postRepository.findById(postId)).thenReturn(Optional.empty());
+		when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
 
 		ApplicationException e = Assertions.assertThrows(
-			ApplicationException.class, () -> postService.like(postId, MemberDto.fromEntity(member)));
+			ApplicationException.class, () -> postService.like(anyLong(), MemberDto.fromEntity(requestMember)));
 		Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, e.getErrorCode());
 	}
 
 	@Test
-	@WithMockUser
 	@Transactional
 	@DisplayName("코멘트 등록 성공 테스트")
 	void CommentCreateSuccess(){
-		String memberId = "memberId";
-		Long postId = 1L;
-		String contents = "comment";
+		Post post = PostFixture.get();
+		Member writer = MemberFixture.get();
 
-		//mocking
-		Post post = PostFixture.get(memberId, postId, 1L);
-		Member writer = MemberFixture.get(memberId, "password", 1L);
-
-		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(writer));
-		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+		when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 		when(commentRepository.save(any())).thenReturn(mock(Comment.class));
+		doNothing().when(alarmProducer).send(any());
 
-		Assertions.assertDoesNotThrow(() -> postService.comment(postId, MemberDto.fromEntity(writer), contents));
+		Assertions.assertDoesNotThrow(() -> postService.comment(anyLong(), MemberDto.fromEntity(writer), anyString()));
 	}
 
 	@Test
-	@WithMockUser
 	@DisplayName("코멘트를 등록할 떄 포스트가 존재하지 않는 경우 실패 테스트")
 	void CommentCreateFailCausedByNotFoundedPost(){
-		String memberId = "memberId";
-		Long postId = 1L;
-		String comment = "comment";
+		Post post = PostFixture.get();
+		Member writer = MemberFixture.get();
 
-		Post post = PostFixture.get(memberId, postId, 1L);
-		Member member = MemberFixture.get(memberId, "password", 1L);
-
-		when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.of(member));
-		when(postRepository.findById(postId)).thenReturn(Optional.empty());
-		when(commentRepository.save(new Comment(member, post, comment))).thenReturn(mock(Comment.class));
+		when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
 
 		ApplicationException e = Assertions.assertThrows(
-			ApplicationException.class, () -> postService.comment(postId, MemberDto.fromEntity(member), comment));
+			ApplicationException.class, () -> postService.comment(anyLong(), MemberDto.fromEntity(writer), anyString()));
 		Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, e.getErrorCode());
 	}
 
