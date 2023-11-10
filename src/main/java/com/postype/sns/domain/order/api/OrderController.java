@@ -36,7 +36,7 @@ public class OrderController {
 	}
 	@Operation(summary = "멤버의 구입 내역 가져오기", description = "로그인한 멤버의 모든 구입내역을 가져옵니다")
 	@GetMapping
-	public Response<Page<OrderResponse>> getOrder(@ApiIgnore @AuthenticationPrincipal MemberDto memberDto, Pageable pageable){
+	public Response<Page<OrderResponse>> getAllOrderList(@ApiIgnore @AuthenticationPrincipal MemberDto memberDto, Pageable pageable){
 		return Response.success(
 			OrderUseCase.getOrder(memberDto, pageable).map(OrderResponse::fromDto));
 	}
