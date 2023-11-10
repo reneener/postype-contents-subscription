@@ -49,14 +49,10 @@ public class MemberService {
 			throw new ApplicationException(ErrorCode.DUPLICATED_MEMBER_ID);
 		});
 
-		Member requestMember = Member.builder()
-				.memberId(request.getMemberId())
-				.memberName(request.getMemberName())
-				.password(encoder.encode(request.getPassword()))
-				.email(request.getEmail())
-				.build();
+		Member member = MemberRegisterRequest.getMember(request);
+		member.setPassword(encoder.encode(member.getPassword()));
 
-		return MemberDto.fromEntity(memberRepository.save(requestMember));
+		return MemberDto.fromEntity(memberRepository.save(member));
 	}
 
 	public String login(MemberLoginRequest request) {
