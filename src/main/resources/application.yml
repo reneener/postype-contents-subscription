@@ -129,3 +129,9 @@ spring:
     console:
       enabled: true
       path: /h2-console
+  kafka:
+    consumer:
+      group-id: sns
+    template:
+      default-topic: alarm
+      enabled: false
