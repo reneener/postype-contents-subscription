@@ -1,6 +1,6 @@
-package com.postype.sns.domain.post.repository;
+package com.postype.sns.domain.timeline.repository;
 
-import com.postype.sns.domain.post.domain.TimeLine;
+import com.postype.sns.domain.timeline.domain.TimeLine;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -3,8 +3,7 @@ package com.postype.sns.domain.post.application;
 import com.postype.sns.domain.member.dto.FollowDto;
 import com.postype.sns.domain.member.dto.MemberDto;
 import com.postype.sns.domain.member.application.FollowService;
-import com.postype.sns.domain.post.application.PostService;
-import com.postype.sns.domain.post.application.TimeLineService;
+import com.postype.sns.domain.timeline.application.TimeLineService;
 import java.util.List;
 import java.util.stream.Collectors;
 

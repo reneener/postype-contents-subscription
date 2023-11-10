@@ -1,9 +1,9 @@
-package com.postype.sns.domain.post.application;
+package com.postype.sns.domain.timeline.application;
 
 import com.postype.sns.domain.member.domain.util.CursorRequest;
 import com.postype.sns.domain.member.domain.util.PageCursor;
-import com.postype.sns.domain.post.domain.TimeLine;
-import com.postype.sns.domain.post.repository.TimeLineRepository;
+import com.postype.sns.domain.timeline.domain.TimeLine;
+import com.postype.sns.domain.timeline.repository.TimeLineRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
