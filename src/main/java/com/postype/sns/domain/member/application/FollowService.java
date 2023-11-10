@@ -33,11 +33,10 @@ public class FollowService {
 
 	@Transactional
 	public FollowDto create(MemberDto fromMemberDto, MemberDto toMemberDto) {
-
 		Member toMember = Member.fromDto(toMemberDto);
 		Member fromMember = Member.fromDto(fromMemberDto);
 
-		if(fromMember.getId() == toMember.getId())
+		if(fromMember.getMemberId().equals(toMember.getMemberId()))
 			throw new ApplicationException(ErrorCode.MEMBER_IS_SAME);
 
 		Follow newFollow = Follow.builder()

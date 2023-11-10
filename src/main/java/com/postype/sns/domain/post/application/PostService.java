@@ -3,6 +3,7 @@ package com.postype.sns.domain.post.application;
 import com.postype.sns.domain.order.domain.Point;
 import com.postype.sns.domain.post.dto.CommentDto;
 import com.postype.sns.domain.member.dto.MemberDto;
+import com.postype.sns.domain.post.dto.request.PostCommentRequest;
 import com.postype.sns.domain.post.dto.request.PostCreateRequest;
 import com.postype.sns.domain.post.dto.request.PostModifyRequest;
 import com.postype.sns.global.common.ErrorCode;
@@ -77,10 +78,10 @@ public class PostService{
 		Member foundedMember = Member.fromDto(memberDto);
 		Post post = getPostOrException(postId);
 
-		if(post.getMember().getId() != foundedMember.getId()){
-			throw new ApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", foundedMember.getMemberId(), postId));
+		if(!post.getMember().getMemberId().equals(foundedMember.getMemberId())){
+			throw new ApplicationException(ErrorCode.INVALID_PERMISSION,
+					String.format("%s has no permission with %s", foundedMember.getMemberId(), postId));
 		}
-
 		post.modify(request.getTitle(), request.getBody());
 
 		return PostDto.fromPost(postRepository.saveAndFlush(post));
@@ -90,7 +91,7 @@ public class PostService{
 		Member foundedMember = Member.fromDto(memberDto);
 		Post post = getPostOrException(postId);
 
-		if(post.getMember().getId() != foundedMember.getId()){
+		if(!post.getMember().getMemberId().equals(foundedMember.getMemberId())){
 			throw new ApplicationException(ErrorCode.INVALID_PERMISSION,
 					String.format("%s has no permission to delete post %s", foundedMember.getMemberId(), postId));
 		}
@@ -176,13 +177,13 @@ public class PostService{
 	}
 
 	@Transactional
-	public void comment(Long postId, MemberDto memberDto, String comment){
+	public void comment(Long postId, MemberDto memberDto, PostCommentRequest request){
 		Member member = Member.fromDto(memberDto);
 		Post post = getPostOrException(postId);
 		Comment newComment = Comment.builder()
 				.member(member)
 				.post(post)
-				.comment(comment)
+				.comment(request.getComment())
 				.build();
 
 		Long cmtId = commentRepository.save(newComment).getId();
