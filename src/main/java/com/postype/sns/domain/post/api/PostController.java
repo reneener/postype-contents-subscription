@@ -1,7 +1,6 @@
 package com.postype.sns.domain.post.api;
 
 import com.postype.sns.domain.member.dto.MemberDto;
-import com.postype.sns.domain.post.dto.request.PostCommentRequest;
 import com.postype.sns.domain.post.dto.request.PostCreateRequest;
 import com.postype.sns.domain.post.dto.request.PostModifyRequest;
 import com.postype.sns.domain.post.dto.response.CommentResponse;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 @RestController
 @RequestMapping("/api/v1/posts")
@@ -90,8 +90,10 @@ public class PostController {
 
 	@Operation(summary = "코멘트 등록하기", description = "로그인한 멤버가 해당 postId에 코멘트를 등록합니다")
 	@PostMapping("{postId}/comments")
-	public Response<Void> comment(@PathVariable Long postId, @Valid @RequestBody PostCommentRequest request, @ApiIgnore @AuthenticationPrincipal MemberDto memberDto){
-		postService.comment(postId, memberDto, request);
+	public Response<Void> comment(@PathVariable Long postId,
+								  @RequestBody @NotBlank(message = "코멘트 내용은 필수입니다") String comment,
+								  @AuthenticationPrincipal MemberDto memberDto){
+		postService.comment(postId, memberDto, comment);
 		return Response.success();
 	}
 	@Operation(summary = "코멘트 가져오기", description = "postId에 해당하는 포스트에 등록된 코멘트 목록 가져오기")

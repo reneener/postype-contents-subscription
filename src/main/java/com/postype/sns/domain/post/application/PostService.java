@@ -3,7 +3,6 @@ package com.postype.sns.domain.post.application;
 import com.postype.sns.domain.order.domain.Point;
 import com.postype.sns.domain.post.dto.CommentDto;
 import com.postype.sns.domain.member.dto.MemberDto;
-import com.postype.sns.domain.post.dto.request.PostCommentRequest;
 import com.postype.sns.domain.post.dto.request.PostCreateRequest;
 import com.postype.sns.domain.post.dto.request.PostModifyRequest;
 import com.postype.sns.global.common.ErrorCode;
@@ -177,13 +176,13 @@ public class PostService{
 	}
 
 	@Transactional
-	public void comment(Long postId, MemberDto memberDto, PostCommentRequest request){
+	public void comment(Long postId, MemberDto memberDto, String comment){
 		Member member = Member.fromDto(memberDto);
 		Post post = getPostOrException(postId);
 		Comment newComment = Comment.builder()
 				.member(member)
 				.post(post)
-				.comment(request.getComment())
+				.comment(comment)
 				.build();
 
 		Long cmtId = commentRepository.save(newComment).getId();
