@@ -25,7 +25,18 @@ public class JwtTokenFilter extends OncePerRequestFilter{
 	private final MemberService memberService;
 	//지정 url은 header가 아닌 param에서 가져오도록
 	private final static List<String> TOKEN_IN_PARAM_URLS = List.of("/api/v1/members/alarm/subscribe");
+	private final static List<String> PERMIT_URLS = List.of(
+			"/",
+			"/h2",
+			"/auth/**",
+			"/api/*/members/register",
+			"/api/*/members/login",
+			"/swagger-ui/**");
 
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+		return PERMIT_URLS.stream().anyMatch(exclude -> exclude.equalsIgnoreCase(request.getServletPath()));
+	}
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
