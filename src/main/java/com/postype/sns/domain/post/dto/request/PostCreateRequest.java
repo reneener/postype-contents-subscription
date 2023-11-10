@@ -1,6 +1,6 @@
 package com.postype.sns.domain.post.dto.request;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,6 +19,7 @@ public class PostCreateRequest {
 	@PositiveOrZero
 	private int price;
 
+	@Builder
 	public PostCreateRequest(String title, String body, int price) {
 		this.title = title;
 		this.body = body;
