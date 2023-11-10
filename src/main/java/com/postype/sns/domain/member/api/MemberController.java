@@ -22,24 +22,25 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/api/v1/members")
 @RequiredArgsConstructor
 public class MemberController {
 
 	private final MemberService memberService;
-
 	private final AlarmService alarmService;
 
 	@Operation(summary = "회원가입", description = "memberId, memberName, password, email로 신규 가입을 진행합니다")
 	@PostMapping("/register")
-	public Response<MemberRegisterResponse> register(@RequestBody MemberRegisterRequest request){
+	public Response<MemberRegisterResponse> register(@Valid @RequestBody MemberRegisterRequest request){
 		return Response.success(
 				MemberRegisterResponse.fromMemberDto(memberService.register(request)));
 	}
 	@Operation(summary = "로그인", description = "memberId와 password로 login 후 authorize를 위한 token 값을 받습니다")
 	@PostMapping("/login")
-	public Response<MemberLoginResponse> login(@RequestBody MemberLoginRequest request){
+	public Response<MemberLoginResponse> login(@Valid @RequestBody MemberLoginRequest request){
 		String token = memberService.login(request);
 		return Response.success(new MemberLoginResponse(token)); //dto <-> response 변환이 아닌 token값 반환
 	}

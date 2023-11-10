@@ -8,10 +8,6 @@ import com.postype.sns.domain.post.dto.response.CommentResponse;
 import com.postype.sns.domain.post.dto.response.PostResponse;
 import com.postype.sns.global.common.Response;
 import com.postype.sns.domain.post.application.PostUseCase;
-import com.postype.sns.domain.post.application.TimeLinePostsUseCase;
-import com.postype.sns.domain.member.domain.util.CursorRequest;
-import com.postype.sns.domain.member.domain.util.PageCursor;
-import com.postype.sns.domain.post.domain.Post;
 import com.postype.sns.domain.post.dto.PostDto;
 import com.postype.sns.domain.post.application.PostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,23 +25,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
 public class PostController {
 
 	private final PostService postService;
-	private final TimeLinePostsUseCase timeLinePostsUseCase;
 	private final PostUseCase createPostUseCase;
+
 	@Operation(summary = "포스트 발행", description = "로그인한 멤버가 title, body, price를 작성하여 포스트를 발행합니다.")
 	@PostMapping
-	public Response<Void> create(@RequestBody PostCreateRequest request, @ApiIgnore @AuthenticationPrincipal MemberDto memberDto){
+	public Response<Void> create(@Valid @RequestBody PostCreateRequest request, @ApiIgnore @AuthenticationPrincipal MemberDto memberDto){
 		createPostUseCase.execute(request, memberDto);
 		return Response.success();
 	}
 	@Operation(summary = "포스트 수정", description = "로그인한 멤버가 변경된 내용으로 포스트를 수정합니다")
 	@PutMapping("/{postId}")
-	public Response<PostResponse> modify(@PathVariable Long postId, @RequestBody PostModifyRequest request,
+	public Response<PostResponse> modify(@PathVariable Long postId, @Valid @RequestBody PostModifyRequest request,
 		@AuthenticationPrincipal MemberDto memberDto){
 		PostDto post = postService.modify(postId, request, memberDto);
 		return Response.success(PostResponse.fromPostDto(post));
@@ -71,13 +69,6 @@ public class PostController {
 		return Response.success(postService.getMyPostList(memberDto, pageable)
 				.map(PostResponse::fromPostDto));
 	}
-
-	@Operation(summary = "타임라인 가져오기", description = "로그인한 멤버의 타임라인 목록을 가져옵니다")
-	@GetMapping("/member/timeline")
-	public Response<PageCursor<Post>> getTimeLine(@ApiIgnore @AuthenticationPrincipal MemberDto memberDto, CursorRequest request){
-		return Response.success(timeLinePostsUseCase.executeTimeLine(memberDto, request));
-	}
-
 	@Operation(summary = "좋아요 표시", description = "로그인한 멤버가 postId에 해당하는 포스트에 좋아요 표시를 합니다")
 	@PostMapping("{postId}/likes")
 	public Response<Void> like(@PathVariable Long postId, @ApiIgnore @AuthenticationPrincipal MemberDto memberDto){
@@ -99,8 +90,8 @@ public class PostController {
 
 	@Operation(summary = "코멘트 등록하기", description = "로그인한 멤버가 해당 postId에 코멘트를 등록합니다")
 	@PostMapping("{postId}/comments")
-	public Response<Void> comment(@PathVariable Long postId, @RequestBody PostCommentRequest request, @ApiIgnore @AuthenticationPrincipal MemberDto memberDto){
-		postService.comment(postId, memberDto, request.getComment());
+	public Response<Void> comment(@PathVariable Long postId, @Valid @RequestBody PostCommentRequest request, @ApiIgnore @AuthenticationPrincipal MemberDto memberDto){
+		postService.comment(postId, memberDto, request);
 		return Response.success();
 	}
 	@Operation(summary = "코멘트 가져오기", description = "postId에 해당하는 포스트에 등록된 코멘트 목록 가져오기")
@@ -109,8 +100,4 @@ public class PostController {
 		return Response.success(postService.getComment(postId, pageable)
 				.map(CommentResponse::fromDto));
 	}
-
-
-
-
 }
