@@ -1,2 +1,2 @@
-# postype-content-subscription
-창작 컨텐츠 구독 플랫폼 postype
+# sns-contents-subscription
+SNS 기반 컨텐츠 구독 API 서버
